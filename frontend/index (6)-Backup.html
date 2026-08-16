@@ -1,0 +1,2505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>SIGNAL — Community Distress Network</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+  :root{
+    --bg:#F3F4F1;
+    --bg-soft:#EBEDE8;
+    --panel:#FBFBF9;
+    --panel-raised:#F2F3EF;
+    --text:#1B1F23;
+    --muted:#68707B;
+    --danger:#D6303C;
+    --danger-glow:rgba(214,48,60,0.18);
+    --danger-bg:rgba(214,48,60,0.08);
+    --safe:#1B9A56;
+    --safe-glow:rgba(27,154,86,0.16);
+    --safe-bg:rgba(27,154,86,0.08);
+    --accent:#C2760A;
+    --accent-glow:rgba(194,118,10,0.16);
+    --accent-bg:rgba(194,118,10,0.08);
+    --info:#2563EB;
+    --info-bg:rgba(37,99,235,0.08);
+    --line:#DFE2DD;
+    --shadow:0 1px 2px rgba(20,20,15,0.04), 0 6px 20px -10px rgba(20,20,15,0.12);
+    --shadow-raised:0 4px 14px -4px rgba(20,20,15,0.16);
+    --header-bg:rgba(243,244,241,0.92);
+    color-scheme: light;
+  }
+  [data-theme="dark"]{
+    --bg:#0B0E11;
+    --bg-soft:#0E1216;
+    --panel:#14181D;
+    --panel-raised:#1B2027;
+    --text:#F2F3F0;
+    --muted:#8A93A3;
+    --danger:#E5484D;
+    --danger-glow:rgba(229,72,77,0.35);
+    --danger-bg:rgba(229,72,77,0.1);
+    --safe:#34C77B;
+    --safe-glow:rgba(52,199,123,0.30);
+    --safe-bg:rgba(52,199,123,0.08);
+    --accent:#F2A93B;
+    --accent-glow:rgba(242,169,59,0.28);
+    --accent-bg:rgba(242,169,59,0.08);
+    --info:#5aa9ff;
+    --info-bg:rgba(90,169,255,0.08);
+    --line:#232830;
+    --shadow:0 1px 2px rgba(0,0,0,0.2), 0 8px 24px -10px rgba(0,0,0,0.5);
+    --shadow-raised:0 6px 20px -6px rgba(0,0,0,0.55);
+    --header-bg:rgba(11,14,17,0.92);
+    color-scheme: dark;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+    transition:background-color .25s ease, color .25s ease;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .display{font-family:'Space Grotesk',sans-serif;}
+  a{color:inherit;}
+  button{font-family:inherit;}
+  :focus-visible{outline:2px solid var(--info);outline-offset:2px;border-radius:4px;}
+
+  header.top{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 20px;border-bottom:1px solid var(--line);
+    position:sticky;top:0;background:var(--header-bg);backdrop-filter:blur(6px);z-index:10;
+    transition:background-color .25s ease, border-color .25s ease;
+  }
+  .header-actions{display:flex;align-items:center;gap:8px;}
+  .brand{display:flex;align-items:center;gap:9px;}
+  .brand-dot{width:9px;height:9px;border-radius:50%;background:var(--danger);box-shadow:0 0 8px var(--danger-glow);}
+  .brand-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px;letter-spacing:0.02em;}
+  .brand-sub{font-size:10px;color:var(--muted);letter-spacing:0.14em;text-transform:uppercase;margin-left:2px;}
+  .home-btn{background:none;border:1px solid var(--line);color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:11px;padding:7px 12px;border-radius:7px;cursor:pointer;min-height:34px;transition:background-color .15s ease, border-color .15s ease;}
+  .home-btn:hover{border-color:var(--muted);}
+  .home-btn:active{background:var(--panel-raised);}
+
+  .theme-toggle{
+    display:flex;align-items:center;gap:6px;background:var(--panel-raised);border:1px solid var(--line);
+    color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:11px;padding:7px 10px;border-radius:20px;
+    cursor:pointer;min-height:34px;transition:background-color .15s ease, border-color .15s ease, color .15s ease;
+  }
+  .theme-toggle:hover{color:var(--text);border-color:var(--muted);}
+  .theme-toggle .tt-icon{font-size:13px;line-height:1;}
+
+  main{max-width:560px;margin:0 auto;padding:24px 20px 60px;}
+
+  /* ---- SPLASH SCREEN ---- */
+  #splash{
+    position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;
+    flex-direction:column;gap:10px;background:var(--bg);transition:opacity .5s ease;
+  }
+  #splash .splash-dot{width:14px;height:14px;border-radius:50%;background:var(--danger);box-shadow:0 0 16px var(--danger-glow);
+    opacity:0;transform:scale(0.6);animation:splashFadeIn .6s ease forwards;}
+  #splash .splash-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:28px;letter-spacing:0.03em;color:var(--text);
+    opacity:0;transform:translateY(6px);animation:splashFadeIn .6s ease forwards;animation-delay:.08s;}
+  #splash .splash-sub{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:0.18em;text-transform:uppercase;
+    opacity:0;animation:splashFadeIn .6s ease forwards;animation-delay:.18s;}
+  @keyframes splashFadeIn{to{opacity:1;transform:none;}}
+  #splash.splash-out{opacity:0;pointer-events:none;}
+  body.splash-active{overflow:hidden;}
+  main.content-enter{animation:contentFadeIn .5s ease both;}
+  @keyframes contentFadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+  /* ---- VIEW TRANSITIONS ---- */
+  main#app{position:relative;}
+  .view-fade-in{animation:viewFadeIn .22s ease both;}
+  @keyframes viewFadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  @media (prefers-reduced-motion: reduce){
+    #splash .splash-dot, #splash .splash-name, #splash .splash-sub{animation:none;opacity:1;transform:none;}
+    main.content-enter, .view-fade-in{animation:none;}
+    #splash{transition:none;}
+  }
+
+  /* ---- INLINE VALIDATION ---- */
+  .field.invalid input, .field.invalid select{border-color:var(--danger)!important;}
+  .field-error{font-size:11px;color:var(--danger);margin-top:6px;line-height:1.5;display:none;}
+  .field.invalid .field-error{display:block;}
+
+  /* ---- ROLE PICKER ---- */
+  .hero{padding:28px 0 8px;}
+  .hero h1{font-family:'Space Grotesk',sans-serif;font-size:26px;line-height:1.25;margin:0 0 10px;}
+  .hero p{color:var(--muted);font-size:14px;line-height:1.6;margin:0;}
+  .role-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:26px;}
+  .role-card{
+    text-align:left;border-radius:16px;padding:22px;border:1px solid var(--line);
+    background:var(--panel);cursor:pointer;box-shadow:var(--shadow);
+    transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+  }
+  .role-card:hover{box-shadow:var(--shadow-raised);}
+  .role-card:active{transform:scale(0.98);}
+  .role-card.need{border-color:var(--danger-glow);}
+  .role-card.need .role-eyebrow{color:var(--danger);}
+  .role-card.vol{border-color:rgba(37,99,235,0.30);}
+  .role-card.vol .role-eyebrow{color:var(--info);}
+  .role-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.14em;color:var(--muted);text-transform:uppercase;margin-bottom:8px;}
+  .role-card h2{font-family:'Space Grotesk',sans-serif;font-size:19px;margin:0 0 6px;}
+  .role-card p{color:var(--muted);font-size:13px;margin:0;line-height:1.5;}
+  .admin-link-row{text-align:center;margin-top:18px;}
+  .admin-link{background:none;border:none;color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:11px;text-decoration:underline;cursor:pointer;padding:8px;}
+
+  /* ---- FORM FIELDS ---- */
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:11px;color:var(--muted);margin-bottom:7px;text-transform:uppercase;letter-spacing:0.08em;font-family:'IBM Plex Mono',monospace;}
+  .field .req{color:var(--danger);}
+  .field input, .field select, .field textarea{
+    width:100%;background:var(--panel);border:1px solid var(--line);color:var(--text);
+    padding:13px 14px;border-radius:10px;font-size:15px;font-family:'Inter',sans-serif;
+    min-height:46px;transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .field select{-webkit-appearance:none;appearance:none;}
+  .field input::placeholder, .field textarea::placeholder{color:var(--muted);opacity:0.8;}
+  .field input:focus, .field select:focus, .field textarea:focus{outline:none;border-color:var(--info);box-shadow:0 0 0 3px var(--info-bg);}
+  .field-hint{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5;}
+  .field-2col{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+  .sos-wrap{display:flex;flex-direction:column;align-items:center;padding:18px 0 8px;}
+  .sos-ring-stage{position:relative;width:220px;height:220px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;}
+  .ring{position:absolute;border-radius:50%;border:1px solid var(--danger);opacity:0;}
+  .pulsing .ring{animation:pulse 2.4s ease-out infinite;}
+  .pulsing .ring:nth-child(2){animation-delay:.8s;}
+  .pulsing .ring:nth-child(3){animation-delay:1.6s;}
+  @keyframes pulse{
+    0%{width:150px;height:150px;opacity:0.55;}
+    100%{width:220px;height:220px;opacity:0;}
+  }
+  .sos-btn{
+    position:relative;z-index:2;width:170px;height:170px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #ff5b60, var(--danger));
+    border:none;color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px;
+    letter-spacing:0.04em;box-shadow:0 0 0 6px rgba(229,72,77,0.12), 0 12px 30px -6px rgba(229,72,77,0.55);
+    cursor:pointer;
+  }
+  .sos-btn:active{transform:scale(0.97);}
+  .sos-btn[disabled]{opacity:0.5;cursor:default;}
+  .sos-btn.mic-mode{
+    background:radial-gradient(circle at 35% 30%, #5aa9ff, #3d7fd9);
+    box-shadow:0 0 0 6px rgba(61,127,217,0.14), 0 12px 30px -6px rgba(61,127,217,0.55);
+    font-size:16px;
+  }
+  .sos-btn.mic-mode.recording{
+    background:radial-gradient(circle at 35% 30%, #ff5b60, var(--danger));
+    box-shadow:0 0 0 6px rgba(229,72,77,0.16), 0 12px 30px -6px rgba(229,72,77,0.6);
+    animation:mic-rec-pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes mic-rec-pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.03);}}
+
+  .status-line{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);text-align:center;margin:6px 0 6px;min-height:16px;}
+  .status-line.live{color:var(--danger);}
+  .wait-line{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);text-align:center;margin-bottom:20px;min-height:14px;}
+  .wait-line.escalate-warn{color:var(--accent);}
+  .wait-line.escalate-critical{color:var(--danger);font-weight:600;}
+
+  .responder-found{width:100%;background:rgba(52,199,123,0.08);border:1px solid rgba(52,199,123,0.35);
+    border-radius:14px;padding:16px;margin-bottom:18px;}
+  .responder-found .rf-title{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--safe);font-size:14px;margin-bottom:8px;}
+  .responder-found .rf-name{font-size:15px;font-weight:600;margin-bottom:2px;}
+  .responder-found .rf-line{font-size:12px;color:var(--muted);line-height:1.6;}
+
+  .safe-btn{
+    width:100%;padding:18px;border-radius:14px;border:1px solid rgba(52,199,123,0.4);
+    background:rgba(52,199,123,0.08);color:var(--safe);font-family:'Space Grotesk',sans-serif;
+    font-weight:700;font-size:16px;cursor:pointer;min-height:56px;
+  }
+  .safe-btn:active{background:rgba(52,199,123,0.16);}
+  .safe-btn[disabled]{opacity:0.4;cursor:default;}
+
+  .hint{font-size:12px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.6;}
+  .disclaimer{font-size:11px;color:var(--muted);text-align:center;margin-top:30px;padding-top:16px;border-top:1px solid var(--line);line-height:1.7;}
+
+  /* ---- CARDS / DASH ---- */
+  .reg-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:16px;box-shadow:var(--shadow);}
+  .reg-card h2{font-family:'Space Grotesk',sans-serif;font-size:18px;margin:0 0 6px;}
+  .reg-card p{color:var(--muted);font-size:13px;margin:0 0 20px;line-height:1.5;}
+  .primary-btn{
+    width:100%;padding:14px;border-radius:10px;border:none;background:var(--text);color:var(--bg);
+    font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;cursor:pointer;min-height:48px;
+    transition:opacity .15s ease, transform .1s ease;
+  }
+  .primary-btn:hover{opacity:0.92;}
+  .primary-btn:active{opacity:0.85;transform:scale(0.99);}
+  .primary-btn[disabled]{opacity:0.4;}
+  .secondary-btn{
+    width:100%;padding:13px;border-radius:10px;border:1px solid var(--line);background:none;color:var(--text);
+    font-family:'IBM Plex Mono',monospace;font-weight:500;font-size:13px;cursor:pointer;min-height:46px;
+    transition:background-color .15s ease, border-color .15s ease;
+  }
+  .secondary-btn:hover{border-color:var(--muted);}
+  .secondary-btn:active{background:var(--panel-raised);}
+  .btn-row{display:flex;gap:10px;margin-top:6px;}
+  .btn-row .primary-btn, .btn-row .secondary-btn{flex:1;}
+
+  .dash-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px;}
+  .dash-head h2{font-family:'Space Grotesk',sans-serif;font-size:18px;margin:0;}
+  .dash-meta{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);}
+
+  .signal-row{
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px;
+    border-left:3px solid var(--danger);box-shadow:var(--shadow);
+  }
+  .signal-row.resolved{border-left-color:var(--safe);opacity:0.55;}
+  .signal-row.responding{border-left-color:var(--accent);}
+  .signal-row.escalate-warn{border-left-color:var(--accent);box-shadow:0 0 0 1px rgba(242,169,59,0.25) inset;}
+  .signal-row.escalate-critical{border-left-color:var(--danger);box-shadow:0 0 0 1px rgba(229,72,77,0.4) inset;}
+  .sig-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px;}
+  .sig-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;}
+  .sig-time{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);}
+  .sig-badge{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;padding:3px 8px;border-radius:5px;white-space:nowrap;}
+  .badge-active{background:rgba(229,72,77,0.15);color:var(--danger);}
+  .badge-responding{background:rgba(242,169,59,0.15);color:var(--accent);}
+  .badge-resolved{background:rgba(52,199,123,0.15);color:var(--safe);}
+  .sig-note{font-size:13px;color:var(--muted);margin-bottom:10px;line-height:1.5;}
+  .sig-wait{font-family:'IBM Plex Mono',monospace;font-size:11px;margin-bottom:8px;color:var(--muted);}
+  .sig-wait.escalate-warn{color:var(--accent);font-weight:600;}
+  .sig-wait.escalate-critical{color:var(--danger);font-weight:700;}
+  .sig-category{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;
+    letter-spacing:0.06em;padding:3px 8px;border-radius:5px;background:rgba(138,147,163,0.15);color:var(--muted);margin-bottom:8px;margin-right:6px;}
+  .match-tag{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;
+    letter-spacing:0.06em;padding:3px 8px;border-radius:5px;margin-bottom:8px;}
+  .match-yes{background:rgba(52,199,123,0.15);color:var(--safe);}
+  .match-no{background:rgba(229,72,77,0.12);color:var(--danger);}
+  .assigned-block{background:rgba(242,169,59,0.08);border:1px solid rgba(242,169,59,0.3);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:12px;line-height:1.6;}
+  .assigned-block b{color:var(--accent);}
+  .sig-actions{display:flex;gap:8px;flex-wrap:wrap;}
+  .sig-actions a, .sig-actions button{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;padding:9px 12px;border-radius:7px;min-height:38px;
+    border:1px solid var(--line);background:var(--panel-raised);color:var(--text);text-decoration:none;cursor:pointer;
+  }
+  .sig-actions button.accept-btn{border-color:rgba(52,199,123,0.4);color:var(--safe);}
+  .sig-actions button.warn-btn{border-color:rgba(229,72,77,0.4);color:var(--danger);}
+  .sig-actions button:active, .sig-actions a:active{background:#242a32;}
+  .empty-state{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;}
+  .refresh-btn{background:none;border:1px solid var(--line);color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:11px;padding:6px 10px;border-radius:7px;cursor:pointer;min-height:34px;}
+  .detail-panel{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:12px;color:var(--text);line-height:1.7;}
+  .detail-panel .dp-row{margin-bottom:6px;}
+  .detail-panel .dp-label{color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;font-family:'IBM Plex Mono',monospace;font-size:10px;}
+  .not-qualified-warn{background:rgba(229,72,77,0.08);border:1px solid rgba(229,72,77,0.3);border-radius:8px;padding:10px;font-size:12px;color:var(--danger);margin:10px 0;line-height:1.5;}
+
+  /* ---- NOTE FIELD ---- */
+  textarea.note-input{
+    width:100%;background:var(--panel);border:1px solid var(--line);color:var(--text);
+    padding:13px 14px;border-radius:10px;font-size:14px;font-family:'Inter',sans-serif;resize:vertical;min-height:64px;
+  }
+  textarea.note-input:focus{outline:none;border-color:var(--accent);}
+
+  /* ---- AI TRIAGE ---- */
+  .triage-tag{display:inline-flex;align-items:center;gap:5px;font-family:'IBM Plex Mono',monospace;font-size:10px;
+    text-transform:uppercase;letter-spacing:0.06em;padding:3px 8px;border-radius:5px;margin-right:6px;margin-bottom:8px;}
+  .triage-critical{background:rgba(229,72,77,0.18);color:var(--danger);}
+  .triage-urgent{background:rgba(242,169,59,0.18);color:var(--accent);}
+  .triage-unclear{background:rgba(138,147,163,0.18);color:var(--muted);}
+  .triage-not-distress{background:rgba(138,147,163,0.12);color:var(--muted);}
+  .triage-pending{background:rgba(138,147,163,0.12);color:var(--muted);font-style:italic;}
+  .self-harm-banner{background:rgba(229,72,77,0.1);border:1px solid rgba(229,72,77,0.35);border-radius:8px;
+    padding:8px 10px;font-size:12px;color:var(--danger);margin-bottom:10px;line-height:1.5;}
+  .ai-note{font-size:13px;color:var(--text);margin:8px 0;line-height:1.5;}
+  .ai-facts{font-size:11px;color:var(--muted);margin-bottom:8px;font-family:'IBM Plex Mono',monospace;}
+  .recv-audio{margin:8px 0;}
+  .recv-audio audio{width:100%;height:34px;}
+  .recv-audio-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;}
+
+  /* ---- TOASTS ---- */
+  #toastStack{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:50;
+    display:flex;flex-direction:column;gap:8px;align-items:center;width:100%;padding:0 20px;pointer-events:none;}
+  .toast{
+    background:var(--panel-raised);border:1px solid var(--line);color:var(--text);
+    padding:11px 16px;border-radius:10px;font-size:13px;font-family:'Inter',sans-serif;
+    box-shadow:0 8px 24px -8px rgba(0,0,0,0.6);max-width:420px;width:100%;text-align:center;
+    opacity:0;transform:translateY(8px);transition:opacity .25s ease, transform .25s ease;
+  }
+  .toast.show{opacity:1;transform:translateY(0);}
+  .toast.toast-safe{border-color:rgba(52,199,123,0.4);}
+  .toast.toast-danger{border-color:rgba(229,72,77,0.4);}
+
+  .seed-btn{background:none;border:1px dashed var(--line);color:var(--muted);font-family:'IBM Plex Mono',monospace;
+    font-size:11px;padding:8px 14px;border-radius:8px;cursor:pointer;margin-top:14px;min-height:38px;}
+  .seed-btn:active{background:var(--panel-raised);}
+
+  /* ---- VOICE RECORDER ---- */
+  .voice-card{width:100%;margin-top:18px;padding:18px;border:1px solid var(--line);border-radius:14px;background:var(--panel);box-shadow:var(--shadow);}
+  .voice-card h3{font-family:'Space Grotesk',sans-serif;font-size:14px;margin:0 0 4px;}
+  .voice-card .voice-sub{font-size:12px;color:var(--muted);margin:0 0 14px;line-height:1.5;}
+  .voice-btn{
+    display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;
+    border-radius:10px;border:1px solid var(--danger);background:rgba(229,72,77,0.08);color:var(--danger);
+    font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;cursor:pointer;
+  }
+  .voice-btn:active{background:rgba(229,72,77,0.16);}
+  .voice-btn.stop-btn{border-color:var(--accent);background:rgba(242,169,59,0.1);color:var(--accent);}
+  .mic-dot{width:9px;height:9px;border-radius:50%;background:var(--danger);animation:mic-pulse 1.1s ease-in-out infinite;}
+  @keyframes mic-pulse{0%,100%{opacity:1;}50%{opacity:0.25;}}
+  .voice-timer{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);text-align:center;margin-top:10px;}
+  .voice-transcript{font-size:13px;color:var(--text);background:var(--panel-raised);border-radius:8px;
+    padding:10px 12px;margin-top:12px;line-height:1.5;min-height:20px;}
+  .voice-transcript.placeholder{color:var(--muted);font-style:italic;}
+  .voice-playback{margin-top:12px;}
+  .voice-playback audio{width:100%;}
+  .voice-unsupported{font-size:12px;color:var(--muted);text-align:center;line-height:1.5;}
+
+  /* ---- VERIFICATION STATUS ---- */
+  .verify-badge{display:inline-flex;align-items:center;gap:7px;font-family:'IBM Plex Mono',monospace;font-size:12px;
+    text-transform:uppercase;letter-spacing:0.06em;padding:7px 12px;border-radius:8px;font-weight:600;}
+  .verify-badge .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .verify-pending{background:rgba(242,169,59,0.12);color:var(--accent);}
+  .verify-pending .dot{background:var(--accent);}
+  .verify-verified{background:rgba(52,199,123,0.12);color:var(--safe);}
+  .verify-verified .dot{background:var(--safe);}
+  .verify-rejected{background:rgba(229,72,77,0.12);color:var(--danger);}
+  .verify-rejected .dot{background:var(--danger);}
+  .verify-expired{background:rgba(138,147,163,0.15);color:var(--muted);}
+  .verify-expired .dot{background:var(--muted);}
+  .status-hero{text-align:center;padding:30px 10px;}
+  .status-hero .verify-badge{font-size:14px;padding:10px 18px;margin-bottom:16px;}
+  .status-hero p{color:var(--muted);font-size:13px;line-height:1.6;max-width:400px;margin:0 auto;}
+
+  /* ---- WIZARD ---- */
+  .wizard-steps{display:flex;gap:5px;margin-bottom:20px;}
+  .wizard-steps .ws-dot{flex:1;height:4px;border-radius:3px;background:var(--line);}
+  .wizard-steps .ws-dot.done{background:var(--safe);}
+  .wizard-steps .ws-dot.active{background:var(--accent);}
+  .wizard-title{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;}
+
+  .checkbox-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .check-item{display:flex;align-items:center;gap:9px;background:var(--panel);border:1px solid var(--line);
+    border-radius:10px;padding:12px;cursor:pointer;font-size:13px;min-height:44px;}
+  .check-item input{width:17px;height:17px;flex-shrink:0;accent-color:var(--accent);}
+  .check-item.checked{border-color:var(--accent);background:rgba(242,169,59,0.06);}
+
+  .cred-card{background:var(--panel-raised);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px;}
+  .cred-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .cred-card-head span{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);text-transform:uppercase;}
+  .remove-cred{background:none;border:none;color:var(--danger);font-size:11px;font-family:'IBM Plex Mono',monospace;cursor:pointer;padding:6px;}
+
+  .profile-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px;}
+  .profile-row:last-child{border-bottom:none;}
+  .profile-row .pr-label{color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;}
+  .profile-row .pr-val{text-align:right;max-width:60%;}
+  .cred-expiry-warn{background:rgba(242,169,59,0.1);border:1px solid rgba(242,169,59,0.35);border-radius:8px;
+    padding:9px 11px;font-size:12px;color:var(--accent);margin-bottom:8px;line-height:1.5;}
+  .cred-expiry-crit{background:rgba(229,72,77,0.1);border:1px solid rgba(229,72,77,0.35);border-radius:8px;
+    padding:9px 11px;font-size:12px;color:var(--danger);margin-bottom:8px;line-height:1.5;}
+
+  .avail-row{display:flex;gap:8px;margin-top:8px;}
+  .avail-btn{flex:1;padding:11px 6px;border-radius:8px;border:1px solid var(--line);background:var(--panel-raised);
+    color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;cursor:pointer;min-height:40px;}
+  .avail-btn.active-available{border-color:var(--safe);color:var(--safe);background:rgba(52,199,123,0.08);}
+  .avail-btn.active-busy{border-color:var(--accent);color:var(--accent);background:rgba(242,169,59,0.08);}
+  .avail-btn.active-offline{border-color:var(--muted);color:var(--text);background:var(--panel-raised);}
+
+  .section-tabs{display:flex;gap:6px;margin-bottom:18px;border-bottom:1px solid var(--line);}
+  .section-tab{background:none;border:none;color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:11px;
+    text-transform:uppercase;letter-spacing:0.06em;padding:10px 4px;cursor:pointer;border-bottom:2px solid transparent;min-height:40px;}
+  .section-tab.active{color:var(--text);border-bottom-color:var(--accent);}
+
+  .demo-banner{background:rgba(90,169,255,0.08);border:1px solid rgba(90,169,255,0.3);border-radius:10px;
+    padding:12px 14px;font-size:12px;color:var(--info);margin-bottom:18px;line-height:1.6;}
+  .demo-banner b{color:var(--info);}
+
+  .admin-row{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow);}
+  .admin-row-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px;}
+  .admin-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;}
+  .admin-sub{font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.6;}
+  .admin-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+  .admin-actions button{font-family:'IBM Plex Mono',monospace;font-size:11px;padding:9px 12px;border-radius:7px;
+    border:1px solid var(--line);background:var(--panel-raised);color:var(--text);cursor:pointer;min-height:38px;}
+  .admin-actions button.approve{border-color:rgba(52,199,123,0.4);color:var(--safe);}
+  .admin-actions button.reject{border-color:rgba(229,72,77,0.4);color:var(--danger);}
+
+  /* ---- ACCOUNT NAV (home screen) ---- */
+  .account-nav{display:flex;justify-content:flex-end;gap:8px;margin-bottom:2px;flex-wrap:wrap;}
+  .account-nav button{background:none;border:1px solid var(--line);color:var(--muted);font-family:'IBM Plex Mono',monospace;
+    font-size:11px;padding:8px 12px;border-radius:8px;cursor:pointer;min-height:38px;}
+  .account-nav button:hover{border-color:var(--muted);color:var(--text);}
+  .account-chip{display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;
+    color:var(--safe);border:1px solid rgba(52,199,123,0.35);background:rgba(52,199,123,0.08);
+    padding:8px 12px;border-radius:8px;}
+
+  /* ---- AUTH SCREENS (login / signup / forgot password) ---- */
+  .auth-wrap{max-width:420px;margin:0 auto;}
+  .auth-brand{text-align:center;padding:10px 0 22px;}
+  .auth-brand .ab-dot{width:11px;height:11px;border-radius:50%;background:var(--danger);box-shadow:0 0 10px var(--danger-glow);margin:0 auto 10px;}
+  .auth-brand h1{font-family:'Space Grotesk',sans-serif;font-size:22px;margin:0 0 4px;}
+  .auth-brand p{color:var(--muted);font-size:13px;margin:0;}
+  .password-field{position:relative;}
+  .password-field input{padding-right:52px;}
+  .password-toggle{
+    position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:none;
+    color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer;
+    padding:9px 10px;border-radius:7px;min-height:38px;
+  }
+  .password-toggle:hover{color:var(--text);}
+  .pw-requirements{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.7;}
+  .pw-requirements .pw-ok{color:var(--safe);}
+  .form-error-banner{background:var(--danger-bg);border:1px solid rgba(214,48,60,0.35);border-radius:10px;
+    padding:11px 13px;font-size:12px;color:var(--danger);margin-bottom:16px;line-height:1.5;}
+  .form-success-banner{background:var(--safe-bg);border:1px solid rgba(27,154,86,0.35);border-radius:10px;
+    padding:14px 16px;font-size:13px;color:var(--safe);margin-bottom:6px;line-height:1.6;}
+  .checkbox-line{display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:16px;}
+  .checkbox-line input{width:18px;height:18px;flex-shrink:0;margin-top:1px;accent-color:var(--accent);}
+  .checkbox-line.invalid{color:var(--danger);}
+  .auth-links{display:flex;justify-content:space-between;align-items:center;margin-top:14px;font-size:12px;flex-wrap:wrap;gap:8px;}
+  .auth-links button{background:none;border:none;color:var(--info);font-family:'Inter',sans-serif;font-size:12px;
+    cursor:pointer;padding:6px 2px;text-decoration:underline;min-height:32px;}
+  .auth-switch{text-align:center;margin-top:20px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);}
+  .auth-switch button{background:none;border:none;color:var(--text);font-weight:600;cursor:pointer;text-decoration:underline;padding:4px;min-height:32px;}
+  .btn-spinner{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,0.35);
+    border-top-color:#fff;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:8px;}
+  .secondary-btn .btn-spinner{border-color:var(--line);border-top-color:var(--text);}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .demo-auth-note{font-size:11px;color:var(--muted);text-align:center;margin-top:22px;line-height:1.6;padding-top:16px;border-top:1px solid var(--line);}
+
+  /* ---- MODAL (privacy / QR scan) ---- */
+  .modal-overlay{position:fixed;inset:0;background:rgba(10,10,10,0.55);backdrop-filter:blur(2px);
+    z-index:80;display:flex;align-items:flex-end;justify-content:center;padding:0;}
+  .modal-box{background:var(--panel);width:100%;max-width:520px;border-radius:18px 18px 0 0;
+    padding:22px 20px calc(22px + env(safe-area-inset-bottom,0px));max-height:85vh;overflow-y:auto;
+    box-shadow:0 -8px 30px -6px rgba(0,0,0,0.4);border:1px solid var(--line);border-bottom:none;}
+  .modal-box h2{font-family:'Space Grotesk',sans-serif;font-size:18px;margin:0 0 12px;}
+  .modal-box p, .modal-box li{font-size:13px;color:var(--muted);line-height:1.6;}
+  .modal-box ul{margin:8px 0 16px;padding-left:20px;}
+  .modal-close-row{display:flex;justify-content:flex-end;margin-bottom:6px;}
+  .modal-close{background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;
+    width:36px;height:36px;cursor:pointer;font-size:15px;}
+  @media (min-width:600px){
+    .modal-overlay{align-items:center;}
+    .modal-box{border-radius:18px;padding-bottom:22px;}
+  }
+
+  /* ---- QR SCAN PROTOTYPE ---- */
+  .qr-scan-btn{width:100%;padding:13px;border-radius:10px;border:1px dashed var(--info);background:var(--info-bg);
+    color:var(--info);font-family:'IBM Plex Mono',monospace;font-weight:500;font-size:13px;cursor:pointer;
+    min-height:46px;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .qr-scan-btn:hover{background:rgba(37,99,235,0.14);}
+  .qr-frame{width:180px;height:180px;margin:16px auto;border:2px dashed var(--info);border-radius:14px;
+    display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:34px;background:var(--panel-raised);}
+  .qr-step-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;
+    letter-spacing:0.1em;text-align:center;margin-bottom:6px;}
+
+  /* ---- GENERIC ERROR / EMPTY STATES ---- */
+  .inline-error{background:var(--danger-bg);border:1px solid rgba(214,48,60,0.3);border-radius:10px;
+    padding:12px 14px;font-size:12px;color:var(--danger);margin:12px 0;line-height:1.6;}
+  .inline-warn{background:var(--accent-bg);border:1px solid rgba(194,118,10,0.3);border-radius:10px;
+    padding:12px 14px;font-size:12px;color:var(--accent);margin:12px 0;line-height:1.6;}
+
+  html, body{overflow-x:hidden;}
+  img, svg{max-width:100%;}
+
+  @media (max-width:420px){
+    .checkbox-grid{grid-template-columns:1fr;}
+    .field-2col{grid-template-columns:1fr;}
+    .sos-ring-stage{width:190px;height:190px;}
+    .sos-btn{width:150px;height:150px;font-size:19px;}
+    .brand-sub{display:none;}
+    .btn-row{flex-direction:column;}
+    .sig-actions{gap:6px;}
+    .sig-actions a, .sig-actions button{flex:1 1 calc(50% - 6px);text-align:center;}
+    .admin-actions{gap:6px;}
+    .admin-actions button{flex:1 1 calc(50% - 6px);}
+    main{padding:18px 14px 50px;}
+    .avail-row{flex-wrap:wrap;}
+    .avail-btn{flex:1 1 30%;}
+  }
+  @media (max-width:340px){
+    .sos-ring-stage{width:168px;height:168px;}
+    .sos-btn{width:140px;height:140px;font-size:17px;}
+    .hero h1{font-size:22px;}
+  }
+  @media (min-width:760px){
+    main{max-width:640px;}
+  }
+</style>
+</head>
+<body class="splash-active">
+<div id="splash" aria-hidden="true">
+  <div class="splash-dot"></div>
+  <div class="splash-name">SIGNAL</div>
+  <div class="splash-sub">Community Distress Network</div>
+</div>
+
+<header class="top">
+  <div class="brand">
+    <div class="brand-dot" id="brandDot"></div>
+    <span class="brand-name">SIGNAL</span>
+    <span class="brand-sub">DISTRESS NETWORK</span>
+  </div>
+  <div class="header-actions">
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle light and dark mode">
+      <span class="tt-icon" id="themeIcon">☀️</span><span id="themeLabel">LIGHT</span>
+    </button>
+    <button class="home-btn" id="acctHeaderBtn" type="button" style="display:none"></button>
+    <button class="home-btn" id="homeBtn" type="button" style="display:none">← HOME</button>
+  </div>
+</header>
+
+<main id="app"></main>
+<div id="toastStack" role="status" aria-live="polite"></div>
+
+<script>
+/* =========================================================================
+   SIGNAL — data model & shared utilities
+   ========================================================================= */
+const app = document.getElementById('app');
+const homeBtn = document.getElementById('homeBtn');
+const brandDot = document.getElementById('brandDot');
+
+/* =========================================================================
+   BACKEND API
+   -------------------------------------------------------------------------
+   SIGNAL now talks to a real Node.js + Express + SQLite backend (see
+   backend/server.js) instead of browser storage. All application data
+   (accounts, signals, rescuers, credentials, assignments) lives in
+   backend/signal.db and is shared across every device/browser that hits
+   this API — that's the whole point of the backend integration.
+
+   Change API_BASE_URL to point at wherever you deploy the backend.
+   ========================================================================= */
+const API_BASE_URL = 'http://localhost:3000/api';
+
+// Small localStorage helper used ONLY for harmless client-side bits that
+// are not application data: theme preference, and a local pointer to
+// "my active signal" (id + the one-time secret the backend issued when it
+// was created, so this browser can mark it safe / attach voice updates
+// without needing a login — sending an SOS never requires an account).
+const localPrefs = {
+  get(key){ try{ const v = localStorage.getItem('signal_local_' + key); return v == null ? null : JSON.parse(v); }catch(e){ return null; } },
+  set(key, value){ try{ localStorage.setItem('signal_local_' + key, JSON.stringify(value)); }catch(e){} },
+  remove(key){ try{ localStorage.removeItem('signal_local_' + key); }catch(e){} }
+};
+
+// Talks to the SIGNAL backend. Always sends cookies (`credentials:'include'`)
+// so the HTTP-only auth cookie set by /api/auth/login is included. Returns
+// the parsed `data` field on success, or throws an Error with a
+// human-readable message on failure (callers show that via toast()).
+async function apiFetch(path, options){
+  options = options || {};
+  const opts = {
+    method: options.method || 'GET',
+    credentials: 'include',
+    headers: Object.assign({}, options.body ? {'Content-Type':'application/json'} : {}, options.headers || {}),
+    body: options.body ? JSON.stringify(options.body) : undefined
+  };
+  let res, json;
+  try{
+    res = await fetch(API_BASE_URL + path, opts);
+  }catch(e){
+    throw new Error('Could not reach the SIGNAL backend. Is server.js running on ' + API_BASE_URL + '?');
+  }
+  try{ json = await res.json(); }catch(e){ json = null; }
+  if (!res.ok || !json || json.success === false){
+    const msg = (json && json.error) ? json.error : ('Request failed (' + res.status + ')');
+    const err = new Error(msg);
+    err.status = res.status;
+    throw err;
+  }
+  return json.data;
+}
+
+/* =========================================================================
+   THEME — light mode is the default; persisted to localStorage.
+   ========================================================================= */
+(function initTheme(){
+  let saved = null;
+  try{ saved = localStorage.getItem('signal-theme'); }catch(e){}
+  const theme = (saved === 'dark' || saved === 'light') ? saved : 'light';
+  applyTheme(theme);
+  const toggleBtn = document.getElementById('themeToggle');
+  toggleBtn.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    const next = current === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    try{ localStorage.setItem('signal-theme', next); }catch(e){}
+  });
+})();
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  const icon = document.getElementById('themeIcon');
+  const label = document.getElementById('themeLabel');
+  if (icon) icon.textContent = theme === 'dark' ? '🌙' : '☀️';
+  if (label) label.textContent = theme === 'dark' ? 'DARK' : 'LIGHT';
+}
+
+/* =========================================================================
+   SPLASH SCREEN — initial load only.
+   ========================================================================= */
+(function initSplash(){
+  const splash = document.getElementById('splash');
+  if (!splash) return;
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const holdMs = reduceMotion ? 0 : 650;
+  const fadeMs = reduceMotion ? 0 : 500;
+  setTimeout(() => {
+    splash.classList.add('splash-out');
+    document.body.classList.remove('splash-active');
+    app.classList.add('content-enter');
+    setTimeout(() => { splash.remove(); }, fadeMs);
+  }, holdMs);
+})();
+
+let view = 'home';
+let signals = [];
+let pollTimer = null;   // full-data poll (dashboard / need view)
+let tickTimer = null;   // 1s cosmetic ticker for waiting-time / escalation display
+
+homeBtn.addEventListener('click', () => { setView('home'); });
+
+function setView(v){
+  view = v;
+  // Hide immediately; refreshAccountHeader() (below) decides whether to
+  // re-show it, based on login state — only logged-in users see "← HOME"
+  // in the navbar, on any screen other than Home itself.
+  homeBtn.style.display = 'none';
+  if (pollTimer){ clearInterval(pollTimer); pollTimer = null; }
+  if (tickTimer){ clearInterval(tickTimer); tickTimer = null; }
+  refreshAccountHeader();
+  render();
+  // subtle, fast fade/slide between views — skipped on the SOS "need help"
+  // screen so emergency actions never wait on decorative motion.
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduceMotion && v !== 'need'){
+    app.classList.remove('view-fade-in');
+    void app.offsetWidth; // reflow to restart animation
+    app.classList.add('view-fade-in');
+  }
+}
+
+function timeAgo(ts){
+  const s = Math.floor((Date.now() - ts) / 1000);
+  if (s < 60) return s + 's ago';
+  const m = Math.floor(s/60);
+  if (m < 60) return m + 'm ago';
+  const h = Math.floor(m/60);
+  return h + 'h ' + (m%60) + 'm ago';
+}
+
+function mmss(totalSeconds){
+  const m = Math.floor(totalSeconds/60), s = Math.floor(totalSeconds%60);
+  return `${m}:${s<10?'0'+s:s}`;
+}
+
+function daysUntil(dateStr){
+  if (!dateStr) return null;
+  const d = new Date(dateStr + 'T00:00:00');
+  if (isNaN(d.getTime())) return null;
+  return Math.ceil((d.getTime() - Date.now()) / 86400000);
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str == null ? '' : String(str);
+  return d.innerHTML;
+}
+
+function toast(message, kind){
+  const stack = document.getElementById('toastStack');
+  const el = document.createElement('div');
+  el.className = 'toast' + (kind ? ' toast-' + kind : '');
+  el.textContent = message;
+  stack.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => el.remove(), 300);
+  }, 3800);
+}
+
+function genId(prefix){
+  return (prefix||'id') + '_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+}
+
+/* ---- backend: distress signals (source of truth = SQLite via API) ---- */
+async function loadSignals(){
+  try{
+    signals = await apiFetch('/signals');
+  }catch(e){ signals = []; toast(e.message, null); }
+  return signals;
+}
+
+/* ---- backend: rescuers ---- */
+// Admin-only: full rescuer directory (used by the verification admin panel).
+async function loadRescuers(){
+  try{
+    return await apiFetch('/admin/rescuers');
+  }catch(e){ toast(e.message, null); return []; }
+}
+// The logged-in user's own rescuer profile, or null if they haven't
+// registered as a rescuer yet. Ownership is determined server-side from
+// the auth cookie — no client-side rescuer-id pointer needed anymore.
+async function getMyRescuerRecord(){
+  try{
+    return await apiFetch('/rescuers/me');
+  }catch(e){
+    if (e.status === 404) return null;
+    return null;
+  }
+}
+
+/* =========================================================================
+   ACCOUNTS — real backend authentication.
+   -------------------------------------------------------------------------
+   Login/signup/logout now call the SIGNAL backend (POST /api/auth/...),
+   which hashes passwords with bcrypt, issues a JWT in an HTTP-only cookie,
+   and is the sole authority on who's logged in. The frontend never sees or
+   stores the password hash or the token itself — the browser just holds
+   the cookie and sends it automatically on every apiFetch() call.
+   ========================================================================= */
+async function getCurrentAccount(){
+  try{
+    return await apiFetch('/auth/me');
+  }catch(e){
+    return null;
+  }
+}
+function normalizeIdentifier(v){ return (v||'').trim().toLowerCase(); }
+function isEmailLike(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+function isPhoneLike(v){ return /^[0-9+\-\s()]{7,}$/.test(v); }
+
+/* Update the small header account chip / login button. Call after any
+   auth state change and once on load. */
+async function refreshAccountHeader(){
+  const btn = document.getElementById('acctHeaderBtn');
+  const acct = await getCurrentAccount();
+
+  // "← HOME" only appears in the navbar once someone is logged in (and
+  // isn't already on Home). Guests navigate back via the in-page
+  // "← Back to home" links on each screen instead.
+  homeBtn.style.display = (acct && view !== 'home') ? 'block' : 'none';
+
+  if (!btn) return;
+  const hideChip = ['home','gate','login','signup','forgot'].includes(view);
+  if (hideChip){ btn.style.display = 'none'; return; }
+  btn.style.display = 'block';
+  btn.textContent = acct ? (acct.fullName ? acct.fullName.split(' ')[0] + ' ▾' : 'ACCOUNT ▾') : 'LOG IN';
+  btn.onclick = () => { setView(acct ? 'account' : 'login'); };
+}
+
+/* =========================================================================
+   MODAL — reusable overlay used by Privacy info and the QR-scan prototype.
+   ========================================================================= */
+function openModal(innerHtml, opts){
+  closeModal();
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'activeModal';
+  overlay.setAttribute('role','dialog');
+  overlay.setAttribute('aria-modal','true');
+  overlay.innerHTML = `
+    <div class="modal-box">
+      <div class="modal-close-row"><button class="modal-close" id="modalCloseBtn" aria-label="Close dialog">✕</button></div>
+      ${innerHtml}
+    </div>`;
+  document.body.appendChild(overlay);
+  const closeBtn = overlay.querySelector('#modalCloseBtn');
+  closeBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+  function escHandler(e){ if (e.key === 'Escape') closeModal(); }
+  document.addEventListener('keydown', escHandler);
+  overlay._escHandler = escHandler;
+  closeBtn.focus();
+  if (opts && opts.onMount) opts.onMount(overlay);
+}
+function closeModal(){
+  const existing = document.getElementById('activeModal');
+  if (existing){
+    if (existing._escHandler) document.removeEventListener('keydown', existing._escHandler);
+    existing.remove();
+  }
+}
+function openPrivacyModal(){
+  openModal(`
+    <h2 class="display">Privacy & data (prototype)</h2>
+    <p>SIGNAL is a frontend prototype. Here's what this demo collects and why:</p>
+    <ul>
+      <li><b>Location</b> — shared with responders only while a signal is active, so help can find you.</li>
+      <li><b>Voice recordings</b> — attached to your signal so responders can hear what's happening; sent to an AI service for triage text only.</li>
+      <li><b>Phone / emergency contact</b> — shown to a rescuer only after they accept your signal, or used for account contact.</li>
+      <li><b>Responder credentials</b> — reviewed in the demo verification panel; treated as sensitive but simulated, not officially verified.</li>
+      <li><b>Account details</b> — stored only in this browser's prototype storage for this demo; not a real authenticated account.</li>
+    </ul>
+    <p><b>Data retention and deletion policies must be implemented by the production backend.</b> This prototype has no automatic deletion, encryption at rest, or access controls beyond what's described here.</p>
+  `);
+}
+
+/* =========================================================================
+   Emergency categories & qualification matching
+   ========================================================================= */
+const CATEGORIES = {
+  medical:       'Medical',
+  fire:          'Fire',
+  search_rescue: 'Search & Rescue',
+  water:         'Water Emergency',
+  disaster:      'Disaster',
+  security:      'Security',
+  mental_health: 'Mental Health/Crisis',
+  general:       'General Assistance',
+  unknown:       'Unknown'
+};
+
+const SPECIALIZATIONS = [
+  'First Aid','CPR','Basic Life Support','Advanced Life Support','Fire Rescue',
+  'Search and Rescue','Water Rescue','Disaster Response','Medical Response',
+  'Mental Health/Crisis Response','Security/Evacuation','Technical Rescue','Other'
+];
+
+const RESPONDER_TYPES = [
+  'Community Volunteer','EMT','Paramedic','Nurse','Physician','Firefighter',
+  'Search & Rescue Team Member','Water Rescue Team Member','Security/Evacuation Officer',
+  'Mental Health Professional','Other'
+];
+
+const CREDENTIAL_TYPES = ['Certification','License','Training Completion','Membership','Other'];
+
+// Which specializations satisfy which emergency categories.
+const QUALIFICATION_TO_CATEGORY = {
+  medical:       ['First Aid','CPR','Basic Life Support','Advanced Life Support','Medical Response'],
+  fire:          ['Fire Rescue','Disaster Response','Technical Rescue'],
+  search_rescue: ['Search and Rescue','Disaster Response','Technical Rescue'],
+  water:         ['Water Rescue','Disaster Response'],
+  disaster:      ['Disaster Response','Search and Rescue','Fire Rescue','Water Rescue'],
+  security:      ['Security/Evacuation'],
+  mental_health: ['Mental Health/Crisis Response'],
+  general:       [], // any verified rescuer may assist
+  unknown:       []
+};
+
+// Returns true if a VERIFIED rescuer's specializations satisfy the category.
+function isQualified(rescuer, category){
+  if (!rescuer || rescuer.verificationStatus !== 'verified') return false;
+  if (category === 'general' || category === 'unknown' || !category) return true;
+  const needed = QUALIFICATION_TO_CATEGORY[category] || [];
+  return (rescuer.specializations || []).some(s => needed.includes(s));
+}
+
+function matchLabel(category){
+  return (CATEGORIES[category] || 'General Assistance').toUpperCase();
+}
+
+/* =========================================================================
+   AI triage — now performed entirely by the backend (POST /api/triage,
+   and automatically on signal creation / voice updates). The frontend no
+   longer calls the Anthropic API directly or holds any AI credentials —
+   see backend/server.js for the triage logic and prompt.
+   ========================================================================= */
+
+function getLocation(){
+  return new Promise((resolve) => {
+    if (!navigator.geolocation){ resolve(null); return; }
+    navigator.geolocation.getCurrentPosition(
+      pos => resolve({lat: pos.coords.latitude, lng: pos.coords.longitude}),
+      () => resolve(null),
+      {timeout: 6000}
+    );
+  });
+}
+
+function blobToDataUrl(blob){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+/* =========================================================================
+   Escalation model — a signal that has been ACTIVE (unclaimed) gets louder
+   the longer it waits. This is purely a display/priority concept in the
+   prototype; see "Remaining production requirements" for real dispatch.
+   ========================================================================= */
+function escalationLevel(sig){
+  if (sig.status !== 'active') return 'none';
+  const waitS = (Date.now() - sig.createdAt) / 1000;
+  if (waitS >= 300) return 'critical'; // 5+ minutes
+  if (waitS >= 120) return 'warn';     // 2-5 minutes
+  return 'normal';
+}
+function escalationLabel(level){
+  if (level === 'critical') return '🚨 UNRESPONDED EMERGENCY';
+  if (level === 'warn') return '⚠ RESPONSE NEEDED';
+  return '🚨 ACTIVE — NO RESPONDER';
+}
+function escalationClass(level){
+  if (level === 'critical') return 'escalate-critical';
+  if (level === 'warn') return 'escalate-warn';
+  return '';
+}
+
+/* =========================================================================
+   Demo data seeding (distress board)
+   ========================================================================= */
+async function seedDemoSignals(){
+  // The backend/database is now the source of truth for signals, so
+  // "seeding demo data" means actually creating real rows through the same
+  // POST /api/signals endpoint the SOS button uses (AI triage runs for
+  // real on each one). Status/assignment can no longer be faked directly —
+  // use the ACCEPT / RESOLVE buttons on a demo signal to see those states.
+  const demo = [
+    {name:'Demo — Jordan', lat:37.7749, lng:-122.4194, category:'fire', note:'Trapped in stairwell, smoke everywhere, cant breathe well'},
+    {name:'Demo — Priya', lat:37.7849, lng:-122.4094, category:'medical', note:'twisted my ankle bad near the north gate, cant walk'},
+    {name:'Demo — Sam', lat:null, lng:null, category:'general', note:'ok found shelter, just cold'}
+  ];
+  for (const d of demo){
+    try{ await apiFetch('/signals', {method:'POST', body:d}); }catch(e){ toast(e.message, null); }
+  }
+}
+
+/* =========================================================================
+   Voice recorder controller (SOS note capture)
+   ========================================================================= */
+const VOICE_MAX_SECONDS = 20;
+
+function createVoiceController({button, timerEl, transcriptEl, playbackEl, onCapture}){
+  const hasRecorder = !!(navigator.mediaDevices && window.MediaRecorder);
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let state = 'idle'; // idle | recording
+  let mediaRecorder = null, chunks = [], recognition = null, finalTranscript = '', seconds = 0, tickHandle = null, stream = null;
+
+  function setIdleMic(label){
+    button.className = 'sos-btn mic-mode';
+    button.innerHTML = label || '🎙️<br>TAP TO<br>SPEAK';
+    button.disabled = false;
+  }
+  function setRecordingUI(){
+    button.className = 'sos-btn mic-mode recording';
+    button.innerHTML = '⏺<br>RECORDING<br>TAP TO STOP';
+  }
+
+  async function start(){
+    if (!hasRecorder){
+      toast('Voice recording not supported in this browser — text note still works', null);
+      return;
+    }
+    try{
+      stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    }catch(e){
+      toast('Microphone permission denied', null);
+      return;
+    }
+    chunks = []; finalTranscript = ''; seconds = 0;
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '';
+    mediaRecorder = mimeType ? new MediaRecorder(stream, {mimeType}) : new MediaRecorder(stream);
+    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+    mediaRecorder.start();
+
+    transcriptEl.style.display = 'block';
+    if (SpeechRec){
+      recognition = new SpeechRec();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.onresult = (event) => {
+        let interim = '';
+        for (let i = event.resultIndex; i < event.results.length; i++){
+          const chunk = event.results[i][0].transcript;
+          if (event.results[i].isFinal) finalTranscript += chunk + ' ';
+          else interim += chunk;
+        }
+        transcriptEl.classList.remove('placeholder');
+        transcriptEl.textContent = (finalTranscript + interim).trim() || 'Listening…';
+      };
+      recognition.onerror = () => {};
+      try{ recognition.start(); }catch(e){}
+    } else {
+      transcriptEl.classList.remove('placeholder');
+      transcriptEl.textContent = 'Transcript unavailable in this browser — audio will still be sent.';
+    }
+
+    state = 'recording';
+    setRecordingUI();
+    timerEl.style.display = 'block';
+    tickHandle = setInterval(() => {
+      seconds++;
+      const m = Math.floor(seconds/60), s = seconds%60;
+      timerEl.textContent = `${m}:${s<10?'0'+s:s} / 0:${VOICE_MAX_SECONDS}`;
+      if (seconds >= VOICE_MAX_SECONDS) stop();
+    }, 1000);
+  }
+
+  function stop(){
+    if (tickHandle){ clearInterval(tickHandle); tickHandle = null; }
+    if (recognition){ try{ recognition.stop(); }catch(e){} }
+    if (!mediaRecorder || mediaRecorder.state === 'inactive') return;
+    mediaRecorder.onstop = async () => {
+      const blob = new Blob(chunks, {type: mediaRecorder.mimeType || 'audio/webm'});
+      const dataUrl = await blobToDataUrl(blob);
+      stream.getTracks().forEach(t => t.stop());
+      timerEl.style.display = 'none';
+      const transcript = finalTranscript.trim();
+      playbackEl.innerHTML = `<div class="voice-playback"><audio controls src="${dataUrl}"></audio></div>`;
+      state = 'idle';
+      setIdleMic('🎙️<br>RE-RECORD');
+      onCapture({audioDataUrl: dataUrl, transcript});
+    };
+    mediaRecorder.stop();
+  }
+
+  return {
+    armMicMode(){ setIdleMic(); },
+    handleClick(){ if (state === 'recording') stop(); else start(); },
+    isRecording(){ return state === 'recording'; },
+    cleanup(){ if (state === 'recording') stop(); }
+  };
+}
+
+/* =========================================================================
+   HOME
+   ========================================================================= */
+async function renderHome(){
+  const acct = await getCurrentAccount();
+  app.innerHTML = `
+    <div class="account-nav">
+      ${acct
+        ? `<span class="account-chip">✓ ${escapeHtml((acct.fullName||'Account').split(' ')[0])}</span><button id="goAccount">Account</button><button id="doLogout">Log out</button>`
+        : `<button id="goLogin">Log in</button><button id="goSignup">Create account</button>`
+      }
+    </div>
+    <div class="hero">
+      <h1 class="display">Send help.<br>Ask for help.<br>Fast.</h1>
+      <p>A shared distress board for community response. Pick your role below.</p>
+    </div>
+    <div class="role-grid">
+      <button class="role-card need" id="goNeed">
+        <div class="role-eyebrow">I need help</div>
+        <h2>Send a distress signal</h2>
+        <p>One tap sends your location to qualified rescuers. Your signal stays active until someone accepts or you mark yourself safe.</p>
+      </button>
+      <button class="role-card vol" id="goVol">
+        <div class="role-eyebrow">I'm a rescuer${acct ? '' : ' · requires account'}</div>
+        <h2>Respond to emergencies</h2>
+        <p>Register your credentials and specializations, get verified, then see emergencies matched to your qualifications.${acct ? '' : ' Log in or create an account first.'}</p>
+      </button>
+    </div>
+    <div class="admin-link-row">
+      <button class="admin-link" id="goAdmin">Verification admin (demo) →</button>
+      <button class="admin-link" id="goPrivacy">Privacy & data (prototype) →</button>
+    </div>
+    <div class="disclaimer">This is a community coordination tool, not a substitute for emergency services. If lives are at immediate risk, contact your local emergency number too. Rescuer credentials in this prototype are self-reported and simulated — see "Verification admin (demo)" for details.</div>
+  `;
+  document.getElementById('goNeed').onclick = () => setView('need');
+  document.getElementById('goVol').onclick = () => {
+    if (!acct){
+      toast('Log in or create an account first to register as a rescuer', null);
+      setView('login');
+      return;
+    }
+    setView('rescuer');
+  };
+  document.getElementById('goAdmin').onclick = () => setView('admin');
+  document.getElementById('goPrivacy').onclick = () => openPrivacyModal();
+  const loginBtn = document.getElementById('goLogin');
+  if (loginBtn) loginBtn.onclick = () => setView('login');
+  const signupBtn = document.getElementById('goSignup');
+  if (signupBtn) signupBtn.onclick = () => setView('signup');
+  const acctBtn = document.getElementById('goAccount');
+  if (acctBtn) acctBtn.onclick = () => setView('account');
+  const logoutBtn = document.getElementById('doLogout');
+  if (logoutBtn) logoutBtn.onclick = async () => { try{ await apiFetch('/auth/logout', {method:'POST'}); }catch(e){} toast('Logged out', null); renderHome(); refreshAccountHeader(); };
+}
+
+/* =========================================================================
+   NEED HELP
+   ========================================================================= */
+async function renderNeed(){
+  app.innerHTML = `
+    <div class="admin-link-row" style="text-align:left;margin-bottom:10px;">
+      <button class="admin-link" id="needBackHome">← Back to home</button>
+    </div>
+    <div class="field">
+      <label>Your name (optional)</label>
+      <input id="needName" type="text" placeholder="e.g. Mia — 2nd floor stairwell" maxlength="60">
+    </div>
+    <div class="field">
+      <label>What's happening? (optional)</label>
+      <textarea id="needNote" class="note-input" placeholder="Brief description — location, injury, hazard…" maxlength="280"></textarea>
+    </div>
+    <div class="field">
+      <label>Emergency type (optional — AI will also assess your note)</label>
+      <select id="needCategory">
+        <option value="">Let AI assess / not sure</option>
+        ${Object.entries(CATEGORIES).filter(([k])=>k!=='unknown').map(([k,v]) => `<option value="${k}">${v}</option>`).join('')}
+      </select>
+    </div>
+    <div class="sos-wrap">
+      <div class="sos-ring-stage" id="ringStage">
+        <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+        <button class="sos-btn" id="sosBtn">SEND<br>SOS</button>
+      </div>
+      <div class="status-line" id="statusLine">Not broadcasting</div>
+      <div class="wait-line" id="waitLine"></div>
+      <div id="responderFoundBox"></div>
+      <div class="voice-timer" id="voiceTimer" style="display:none;"></div>
+      <div class="voice-transcript placeholder" id="voiceTranscriptBox" style="display:none;">Listening…</div>
+      <div id="voicePlayback"></div>
+      <button class="safe-btn" id="safeBtn" disabled>✓ I'M SAFE / RESCUED</button>
+      <div class="hint" id="hintText">Sending shares your name (if entered) and device location with verified rescuers. Tap "I'm safe" any time to stop the alert.</div>
+    </div>
+  `;
+  const sosBtn = document.getElementById('sosBtn');
+  const safeBtn = document.getElementById('safeBtn');
+  const stage = document.getElementById('ringStage');
+  const statusLine = document.getElementById('statusLine');
+  const waitLine = document.getElementById('waitLine');
+  const responderFoundBox = document.getElementById('responderFoundBox');
+  const nameInput = document.getElementById('needName');
+  const noteInput = document.getElementById('needNote');
+  const categorySelect = document.getElementById('needCategory');
+  const voiceTimer = document.getElementById('voiceTimer');
+  const voiceTranscriptBox = document.getElementById('voiceTranscriptBox');
+  document.getElementById('needBackHome').onclick = () => setView('home');
+  const voicePlayback = document.getElementById('voicePlayback');
+  const hintText = document.getElementById('hintText');
+
+  let mySignalId = null;
+  let mySignalSecret = null;
+  {
+    const rec = localPrefs.get('signal'); // {id, secret}
+    if (rec && rec.id && rec.secret){
+      try{
+        const list = await loadSignals();
+        const existing = list.find(s => s.id === rec.id && s.status !== 'resolved');
+        if (existing){ mySignalId = existing.id; mySignalSecret = rec.secret; }
+        else localPrefs.remove('signal');
+      }catch(e){}
+    }
+  }
+
+  // The backend runs AI triage itself (POST /api/signals/:id/audio), so
+  // attaching a voice update is just one API call — no separate client-side
+  // triage step needed.
+  async function captureVoiceUpdate({audioDataUrl, transcript}){
+    if (!mySignalId || !mySignalSecret) return;
+    try{
+      await apiFetch(`/signals/${mySignalId}/audio`, {method:'POST', body:{audioDataUrl, transcript: transcript || '', ownerSecret: mySignalSecret}});
+      toast('Voice update attached to your signal', 'safe');
+    }catch(e){ toast(e.message, null); }
+  }
+
+  const voiceCtl = createVoiceController({
+    button: sosBtn, timerEl: voiceTimer, transcriptEl: voiceTranscriptBox,
+    playbackEl: voicePlayback, onCapture: captureVoiceUpdate
+  });
+
+  function enterMicMode(){
+    stage.classList.add('pulsing');
+    safeBtn.disabled = false;
+    hintText.textContent = 'Tap the mic and tell us what\'s happening — up to 20 seconds. Tap "I\'m safe" any time to stop the alert.';
+    voiceCtl.armMicMode();
+  }
+
+  function renderSignalStatus(sig){
+    if (!sig){
+      statusLine.textContent = 'Not broadcasting';
+      statusLine.classList.remove('live');
+      waitLine.textContent = '';
+      waitLine.className = 'wait-line';
+      responderFoundBox.innerHTML = '';
+      return;
+    }
+    if (sig.status === 'resolved'){
+      statusLine.textContent = 'Marked safe — signal cleared';
+      statusLine.classList.remove('live');
+      waitLine.textContent = '';
+      responderFoundBox.innerHTML = '';
+      return;
+    }
+    if (sig.status === 'responding'){
+      statusLine.textContent = '✓ RESPONDER FOUND';
+      statusLine.classList.remove('live');
+      waitLine.textContent = '';
+      waitLine.className = 'wait-line';
+      responderFoundBox.innerHTML = `
+        <div class="responder-found">
+          <div class="rf-title">✓ Responder assigned</div>
+          <div class="rf-name">${escapeHtml(sig.assignedRescuerName || 'A verified rescuer')}</div>
+          <div class="rf-line">Verified: ${escapeHtml(sig.assignedQualification || 'Qualified responder')}</div>
+          <div class="rf-line">Accepted ${sig.acceptedAt ? timeAgo(sig.acceptedAt) : 'just now'}</div>
+          <div class="rf-line">Status: en route / responding</div>
+        </div>`;
+      return;
+    }
+    // active / unclaimed
+    statusLine.textContent = '🚨 DISTRESS SIGNAL ACTIVE — searching for a qualified responder…';
+    statusLine.classList.add('live');
+    responderFoundBox.innerHTML = '';
+    const level = escalationLevel(sig);
+    const waitS = Math.floor((Date.now() - sig.createdAt)/1000);
+    waitLine.className = 'wait-line ' + escalationClass(level);
+    const prefix = level === 'normal' ? 'NO RESPONDER YET · Your signal remains active.' : escalationLabel(level);
+    waitLine.textContent = `${prefix}  ·  Waiting for responder: ${mmss(waitS)}`;
+  }
+
+  async function refreshMySignal(){
+    if (!mySignalId) return;
+    const list = await loadSignals();
+    const sig = list.find(s => s.id === mySignalId);
+    renderSignalStatus(sig);
+    if (sig && sig.status === 'resolved'){
+      // was resolved by a responder/admin elsewhere — reset the form
+      resetToIdle();
+    }
+  }
+
+  function resetToIdle(){
+    stage.classList.remove('pulsing');
+    sosBtn.className = 'sos-btn';
+    sosBtn.innerHTML = 'SEND<br>SOS';
+    sosBtn.disabled = false;
+    safeBtn.disabled = true;
+    nameInput.disabled = false;
+    noteInput.disabled = false;
+    categorySelect.disabled = false;
+    voiceTimer.style.display = 'none';
+    voiceTranscriptBox.style.display = 'none';
+    voiceTranscriptBox.classList.add('placeholder');
+    voiceTranscriptBox.textContent = 'Listening…';
+    voicePlayback.innerHTML = '';
+    hintText.textContent = 'Sending shares your name (if entered) and device location with verified rescuers. Tap "I\'m safe" any time to stop the alert.';
+    mySignalId = null;
+    if (pollTimer){ clearInterval(pollTimer); pollTimer = null; }
+    if (tickTimer){ clearInterval(tickTimer); tickTimer = null; }
+    renderSignalStatus(null);
+  }
+
+  function startWatchingMySignal(){
+    if (pollTimer) clearInterval(pollTimer);
+    if (tickTimer) clearInterval(tickTimer);
+    pollTimer = setInterval(refreshMySignal, 4000);
+    tickTimer = setInterval(refreshMySignal, 1000); // cheap re-render keeps the wait clock live
+  }
+
+  if (mySignalId){
+    const list = await loadSignals();
+    const sig = list.find(s => s.id === mySignalId);
+    if (sig) {
+      nameInput.value = sig.name || ''; nameInput.disabled = true;
+      noteInput.value = sig.note || ''; noteInput.disabled = true;
+      categorySelect.value = sig.category || ''; categorySelect.disabled = true;
+      stage.classList.add('pulsing');
+      safeBtn.disabled = false;
+      sosBtn.className = 'sos-btn mic-mode';
+      sosBtn.innerHTML = '🎙️<br>RE-RECORD';
+      voiceCtl.armMicMode();
+      renderSignalStatus(sig);
+      startWatchingMySignal();
+    }
+  }
+
+  sosBtn.addEventListener('click', async () => {
+    if (mySignalId){ voiceCtl.handleClick(); return; }
+
+    sosBtn.disabled = true;
+    noteInput.disabled = true;
+    categorySelect.disabled = true;
+    statusLine.textContent = 'Getting location…';
+    if (!window.isSecureContext && navigator.geolocation){
+      toast('This page is not running on HTTPS — location sharing may be blocked by your browser.', null);
+    }
+    const loc = await getLocation();
+    if (!loc){
+      toast('Location access was unavailable. Your signal can still be created, but responders may not receive your exact location.', null);
+    }
+    const note = noteInput.value.trim();
+    const manualCategory = categorySelect.value || null;
+    let sig;
+    try{
+      // The backend creates the row, runs AI triage, and returns both the
+      // signal and a one-time ownerSecret — the only thing that lets this
+      // browser mark it safe or attach a voice update later without a login.
+      sig = await apiFetch('/signals', {method:'POST', body:{
+        name: nameInput.value.trim() || 'Anonymous',
+        lat: loc ? loc.lat : null,
+        lng: loc ? loc.lng : null,
+        category: manualCategory,
+        note
+      }});
+    }catch(e){
+      toast(e.message, null);
+      sosBtn.disabled = false;
+      noteInput.disabled = false;
+      categorySelect.disabled = false;
+      statusLine.textContent = 'Not broadcasting';
+      return;
+    }
+    localPrefs.set('signal', {id: sig.id, secret: sig.ownerSecret});
+    mySignalId = sig.id;
+    mySignalSecret = sig.ownerSecret;
+    nameInput.disabled = true;
+    sosBtn.disabled = false;
+    toast('Signal sent — qualified rescuers notified', 'danger');
+    enterMicMode();
+    renderSignalStatus(sig);
+    startWatchingMySignal();
+  });
+
+  safeBtn.addEventListener('click', async () => {
+    if (!mySignalId || !mySignalSecret) return;
+    voiceCtl.cleanup();
+    try{
+      await apiFetch(`/signals/${mySignalId}/safe`, {method:'POST', body:{ownerSecret: mySignalSecret}});
+    }catch(e){ toast(e.message, null); }
+    localPrefs.remove('signal');
+    resetToIdle();
+    noteInput.value = '';
+    categorySelect.value = '';
+    toast('Marked safe — thanks for checking in', 'safe');
+  });
+}
+
+/* =========================================================================
+   RESCUER — entry point (router between signup / status / dashboard)
+   ========================================================================= */
+async function renderRescuer(){
+  const acct = await getCurrentAccount();
+  if (!acct){
+    // Safety net: the "I'm a rescuer" button on Home already checks this,
+    // but guard here too in case this view is reached another way.
+    toast('Log in or create an account first to access the rescuer area', null);
+    setView('login');
+    return;
+  }
+  const myRescuer = await getMyRescuerRecord();
+  if (!myRescuer){
+    renderRescuerSignup();
+    return;
+  }
+  if (myRescuer.verificationStatus === 'verified'){
+    // check for expiry on any credential (auto-flip to expired for display)
+    const expired = (myRescuer.credentials||[]).length > 0 &&
+      (myRescuer.credentials||[]).every(c => { const d = daysUntil(c.expiry); return d != null && d < 0; });
+    renderRescuerDashboard(myRescuer);
+  } else {
+    renderRescuerStatus(myRescuer);
+  }
+}
+
+/* ---- SIGN-UP WIZARD ---- */
+function renderRescuerSignup(){
+  const draft = {
+    fullName:'', preferredName:'', age:'', phone:'', email:'', city:'', emergencyContact:'',
+    responderType:'', org:'', yearsExp:'', areas:'', maxRadius:'',
+    specializations: [],
+    credentials: []
+  };
+  let step = 1;
+  const TOTAL_STEPS = 4;
+
+  function stepsHtml(){
+    let dots = '';
+    for (let i=1;i<=TOTAL_STEPS;i++){
+      dots += `<div class="ws-dot ${i<step?'done':(i===step?'active':'')}"></div>`;
+    }
+    return `<div class="wizard-steps">${dots}</div>`;
+  }
+
+  function renderStep(){
+    if (step === 1) renderStep1();
+    else if (step === 2) renderStep2();
+    else if (step === 3) renderStep3();
+    else renderStep4();
+  }
+
+  function renderStep1(){
+    app.innerHTML = `
+      <div class="admin-link-row" style="text-align:left;margin-bottom:8px;">
+        <button class="admin-link" id="regBackHome">← Back to home</button>
+      </div>
+      <div class="wizard-title">Step 1 of ${TOTAL_STEPS} · Personal & responder information</div>
+      ${stepsHtml()}
+      <div class="reg-card">
+        <h2 class="display">Tell us about you</h2>
+        <p>Your contact details are shared with the person you accept an emergency for — never published publicly.</p>
+        <button type="button" class="qr-scan-btn" id="scanQrBtn">⧉ SCAN ID QR (prototype autofill)</button>
+        <div class="field" id="fldFullName"><label>Full name <span class="req">*</span></label><input id="fFullName" value="${escapeHtml(draft.fullName)}" maxlength="80" placeholder="e.g. Maria Santos"><div class="field-error">Full name is required.</div></div>
+        <div class="field"><label>Preferred name</label><input id="fPreferredName" value="${escapeHtml(draft.preferredName)}" maxlength="40" placeholder="Shown to people you help"></div>
+        <div class="field-2col">
+          <div class="field" id="fldAge"><label>Age</label><input id="fAge" type="number" inputmode="numeric" min="1" max="120" placeholder="e.g. 34" value="${escapeHtml(draft.age)}"><div class="field-error">Age must be between 1 and 120.</div></div>
+          <div class="field" id="fldPhone"><label>Contact number <span class="req">*</span></label><input id="fPhone" type="tel" inputmode="numeric" maxlength="11" placeholder="09XXXXXXXXX" value="${escapeHtml(draft.phone)}"><div class="field-error">Enter a valid number (up to 11 digits).</div></div>
+        </div>
+        <div class="field" id="fldEmail"><label>Email address <span class="req">*</span></label><input id="fEmail" type="email" value="${escapeHtml(draft.email)}" maxlength="100" placeholder="name@example.com"><div class="field-error">A valid email address is required.</div></div>
+        <div class="field-2col">
+          <div class="field"><label>City / municipality</label><input id="fCity" value="${escapeHtml(draft.city)}" maxlength="60"></div>
+          <div class="field"><label>Emergency contact</label><input id="fEmergencyContact" value="${escapeHtml(draft.emergencyContact)}" maxlength="80" placeholder="Name + number"></div>
+        </div>
+        <div class="field" id="fldResponderType">
+          <label>Responder type <span class="req">*</span></label>
+          <select id="fResponderType">
+            <option value="">Select…</option>
+            ${RESPONDER_TYPES.map(t => `<option value="${t}" ${draft.responderType===t?'selected':''}>${t}</option>`).join('')}
+          </select>
+          <div class="field-error">Please select a responder type.</div>
+        </div>
+        <div class="field"><label>Organization / affiliation</label><input id="fOrg" value="${escapeHtml(draft.org)}" maxlength="80" placeholder="e.g. Red Cross chapter, fire dept, independent"></div>
+        <div class="field-2col">
+          <div class="field"><label>Years of experience</label><input id="fYearsExp" type="number" min="0" max="60" value="${escapeHtml(draft.yearsExp)}"></div>
+          <div class="field"><label>Max response radius (km)</label><input id="fMaxRadius" type="number" min="0" max="500" value="${escapeHtml(draft.maxRadius)}"></div>
+        </div>
+        <div class="field"><label>Areas you can respond to</label><input id="fAreas" value="${escapeHtml(draft.areas)}" maxlength="120" placeholder="Neighborhoods, districts, etc."></div>
+        <div class="btn-row"><button class="primary-btn" id="next1">Continue →</button></div>
+      </div>
+    `;
+    document.getElementById('regBackHome').onclick = () => setView('home');
+    // Phone: digits only, hard-capped at 11 characters (validated both via
+    // maxlength/inputmode attributes above and here in JS).
+    const phoneEl = document.getElementById('fPhone');
+    phoneEl.addEventListener('input', () => {
+      const digitsOnly = phoneEl.value.replace(/\D/g, '').slice(0, 11);
+      if (digitsOnly !== phoneEl.value) phoneEl.value = digitsOnly;
+      document.getElementById('fldPhone').classList.remove('invalid');
+    });
+    const ageEl = document.getElementById('fAge');
+    ageEl.addEventListener('input', () => {
+      document.getElementById('fldAge').classList.remove('invalid');
+    });
+
+    document.getElementById('scanQrBtn').onclick = () => {
+      openModal(`
+        <div class="qr-step-label">Scan ID QR — prototype only</div>
+        <h2 class="display">Scan a compatible QR code</h2>
+        <p>This demo does <b>not</b> perform real identity or National ID verification — it only offers to autofill form fields for testing. A production build would need a real backend verification service and explicit camera permission handling.</p>
+        <div class="qr-frame" aria-hidden="true">▦</div>
+        <div class="btn-row">
+          <button class="secondary-btn" id="qrManual" type="button">Enter manually</button>
+          <button class="primary-btn" id="qrSimulate" type="button">Simulate scan (demo)</button>
+        </div>
+      `, {
+        onMount: () => {
+          document.getElementById('qrManual').onclick = closeModal;
+          document.getElementById('qrSimulate').onclick = () => {
+            closeModal();
+            openModal(`
+              <div class="qr-step-label">Information detected</div>
+              <h2 class="display">Review before confirming</h2>
+              <p>Sample demo data — nothing was actually scanned or verified.</p>
+              <div class="profile-row"><span class="pr-label">Name</span><span class="pr-val">Juan Dela Cruz</span></div>
+              <div class="profile-row"><span class="pr-label">Birth date</span><span class="pr-val">1994-03-12</span></div>
+              <div class="btn-row" style="margin-top:16px;">
+                <button class="secondary-btn" id="qrCancel" type="button">Cancel</button>
+                <button class="primary-btn" id="qrConfirm" type="button">Confirm & autofill</button>
+              </div>
+            `, {
+              onMount: () => {
+                document.getElementById('qrCancel').onclick = closeModal;
+                document.getElementById('qrConfirm').onclick = () => {
+                  document.getElementById('fFullName').value = 'Juan Dela Cruz';
+                  document.getElementById('fldFullName').classList.remove('invalid');
+                  closeModal();
+                  toast('Demo autofill applied — please verify every field', null);
+                };
+              }
+            });
+          };
+        }
+      });
+    };
+
+    function isValidEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+    document.getElementById('next1').onclick = () => {
+      draft.fullName = document.getElementById('fFullName').value.trim();
+      draft.preferredName = document.getElementById('fPreferredName').value.trim();
+      draft.age = document.getElementById('fAge').value.trim();
+      draft.phone = phoneEl.value.replace(/\D/g, '').slice(0, 11);
+      draft.email = document.getElementById('fEmail').value.trim();
+      draft.city = document.getElementById('fCity').value.trim();
+      draft.emergencyContact = document.getElementById('fEmergencyContact').value.trim();
+      draft.responderType = document.getElementById('fResponderType').value;
+      draft.org = document.getElementById('fOrg').value.trim();
+      draft.yearsExp = document.getElementById('fYearsExp').value.trim();
+      draft.maxRadius = document.getElementById('fMaxRadius').value.trim();
+      draft.areas = document.getElementById('fAreas').value.trim();
+
+      let firstInvalid = null;
+      const markInvalid = (fieldId) => {
+        document.getElementById(fieldId).classList.add('invalid');
+        if (!firstInvalid) firstInvalid = fieldId;
+      };
+      if (!draft.fullName) markInvalid('fldFullName');
+      if (!draft.phone || draft.phone.length > 11) markInvalid('fldPhone');
+      if (!draft.email || !isValidEmail(draft.email)) markInvalid('fldEmail');
+      if (!draft.responderType) markInvalid('fldResponderType');
+      const ageNum = draft.age === '' ? null : Number(draft.age);
+      if (draft.age !== '' && (isNaN(ageNum) || ageNum < 1 || ageNum > 120)) markInvalid('fldAge');
+
+      if (firstInvalid){
+        document.getElementById(firstInvalid).scrollIntoView({behavior:'smooth', block:'center'});
+        return;
+      }
+      step = 2; renderStep();
+    };
+  }
+
+  function renderStep2(){
+    app.innerHTML = `
+      <div class="wizard-title">Step 2 of ${TOTAL_STEPS} · Specializations</div>
+      ${stepsHtml()}
+      <div class="reg-card">
+        <h2 class="display">What can you respond to?</h2>
+        <p>Select every specialization that applies. Selecting one does not verify it — that happens during credential review.</p>
+        <div class="checkbox-grid" id="specGrid">
+          ${SPECIALIZATIONS.map(s => `
+            <label class="check-item ${draft.specializations.includes(s)?'checked':''}" data-spec="${escapeHtml(s)}">
+              <input type="checkbox" ${draft.specializations.includes(s)?'checked':''}> ${escapeHtml(s)}
+            </label>`).join('')}
+        </div>
+        <div class="btn-row" style="margin-top:20px;">
+          <button class="secondary-btn" id="back2">← Back</button>
+          <button class="primary-btn" id="next2">Continue →</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('specGrid').querySelectorAll('.check-item').forEach(label => {
+      label.addEventListener('click', (e) => {
+        e.preventDefault();
+        const s = label.getAttribute('data-spec');
+        const idx = draft.specializations.indexOf(s);
+        if (idx > -1) draft.specializations.splice(idx,1); else draft.specializations.push(s);
+        label.classList.toggle('checked');
+        label.querySelector('input').checked = draft.specializations.includes(s);
+      });
+    });
+    document.getElementById('back2').onclick = () => { step = 1; renderStep(); };
+    document.getElementById('next2').onclick = () => {
+      if (!draft.specializations.length){
+        if (!confirm('No specializations selected — you will only be eligible for general assistance. Continue anyway?')) return;
+      }
+      step = 3; renderStep();
+    };
+  }
+
+  function renderStep3(){
+    app.innerHTML = `
+      <div class="wizard-title">Step 3 of ${TOTAL_STEPS} · Credentials & certifications</div>
+      ${stepsHtml()}
+      <div class="reg-card">
+        <h2 class="display">Add your credentials</h2>
+        <p>Add each certification or license separately. All credentials start as <b class="mono">PENDING VERIFICATION</b> until a verifier reviews them.</p>
+        <div id="credList"></div>
+        <button class="secondary-btn" id="addCred" type="button">+ Add another credential</button>
+        <div class="btn-row" style="margin-top:20px;">
+          <button class="secondary-btn" id="back3">← Back</button>
+          <button class="primary-btn" id="next3">Continue →</button>
+        </div>
+      </div>
+    `;
+    const credList = document.getElementById('credList');
+
+    function drawCreds(){
+      if (!draft.credentials.length){
+        credList.innerHTML = `<div class="field-hint" style="margin-bottom:14px;">No credentials added yet. You can submit without one, but verification will likely require at least one.</div>`;
+        return;
+      }
+      credList.innerHTML = draft.credentials.map((c, i) => `
+        <div class="cred-card">
+          <div class="cred-card-head"><span>Credential ${i+1}</span><button class="remove-cred" data-i="${i}" type="button">Remove</button></div>
+          <div class="field"><label>Certification name</label><input class="cName" data-i="${i}" value="${escapeHtml(c.name)}" placeholder="e.g. Basic Life Support"></div>
+          <div class="field-2col">
+            <div class="field"><label>Type</label>
+              <select class="cType" data-i="${i}">
+                ${CREDENTIAL_TYPES.map(t=>`<option value="${t}" ${c.type===t?'selected':''}>${t}</option>`).join('')}
+              </select>
+            </div>
+            <div class="field"><label>Issuing organization</label><input class="cOrg" data-i="${i}" value="${escapeHtml(c.org)}"></div>
+          </div>
+          <div class="field"><label>Credential / license number</label><input class="cNumber" data-i="${i}" value="${escapeHtml(c.number)}"></div>
+          <div class="field-2col">
+            <div class="field"><label>Date issued</label><input class="cIssued" data-i="${i}" type="date" value="${escapeHtml(c.issued)}"></div>
+            <div class="field"><label>Expiration date</label><input class="cExpiry" data-i="${i}" type="date" value="${escapeHtml(c.expiry)}"></div>
+          </div>
+          <div class="field"><label>Relevant training / notes</label><textarea class="cNotes note-input" data-i="${i}" maxlength="200">${escapeHtml(c.notes)}</textarea></div>
+        </div>
+      `).join('');
+      credList.querySelectorAll('.remove-cred').forEach(btn => btn.onclick = () => {
+        draft.credentials.splice(parseInt(btn.getAttribute('data-i')),1); drawCreds();
+      });
+      credList.querySelectorAll('input,select,textarea').forEach(el => {
+        el.addEventListener('input', () => syncCreds());
+        el.addEventListener('change', () => syncCreds());
+      });
+    }
+    function syncCreds(){
+      draft.credentials.forEach((c, i) => {
+        const g = sel => credList.querySelector(`.${sel}[data-i="${i}"]`);
+        c.name = g('cName').value.trim();
+        c.type = g('cType').value;
+        c.org = g('cOrg').value.trim();
+        c.number = g('cNumber').value.trim();
+        c.issued = g('cIssued').value;
+        c.expiry = g('cExpiry').value;
+        c.notes = g('cNotes').value.trim();
+      });
+    }
+    drawCreds();
+    document.getElementById('addCred').onclick = () => {
+      draft.credentials.push({id: genId('cred'), name:'', type:'Certification', org:'', number:'', issued:'', expiry:'', notes:'', status:'pending'});
+      drawCreds();
+    };
+    document.getElementById('back3').onclick = () => { syncCreds(); step = 2; renderStep(); };
+    document.getElementById('next3').onclick = () => { syncCreds(); step = 4; renderStep(); };
+  }
+
+  function renderStep4(){
+    app.innerHTML = `
+      <div class="wizard-title">Step 4 of ${TOTAL_STEPS} · Review & submit</div>
+      ${stepsHtml()}
+      <div class="reg-card">
+        <h2 class="display">Review your submission</h2>
+        <p>Submitting sends your information for verification. You won't have responder-dashboard access until an authorized verifier approves your credentials.</p>
+        <div class="profile-row"><span class="pr-label">Name</span><span class="pr-val">${escapeHtml(draft.fullName)}${draft.preferredName ? ' ("'+escapeHtml(draft.preferredName)+'")' : ''}</span></div>
+        <div class="profile-row"><span class="pr-label">Responder type</span><span class="pr-val">${escapeHtml(draft.responderType)}</span></div>
+        <div class="profile-row"><span class="pr-label">Organization</span><span class="pr-val">${escapeHtml(draft.org || '—')}</span></div>
+        <div class="profile-row"><span class="pr-label">Experience</span><span class="pr-val">${escapeHtml(draft.yearsExp || '0')} yrs</span></div>
+        <div class="profile-row"><span class="pr-label">Response radius</span><span class="pr-val">${escapeHtml(draft.maxRadius || '—')} km</span></div>
+        <div class="profile-row"><span class="pr-label">Specializations</span><span class="pr-val">${draft.specializations.length ? escapeHtml(draft.specializations.join(', ')) : 'None selected'}</span></div>
+        <div class="profile-row"><span class="pr-label">Credentials</span><span class="pr-val">${draft.credentials.length} added</span></div>
+        <div class="demo-banner" style="margin-top:16px;"><b>DEMO VERIFICATION.</b> In this prototype, credential verification is simulated through an in-app admin panel for demonstration only. A production deployment would require a secure backend that verifies credentials directly with the relevant licensing organizations before granting dashboard access.</div>
+        <div class="btn-row" style="margin-top:6px;">
+          <button class="secondary-btn" id="back4">← Back</button>
+          <button class="primary-btn" id="submitReg">Submit for verification</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('back4').onclick = () => { step = 3; renderStep(); };
+    document.getElementById('submitReg').onclick = async () => {
+      const submitBtn = document.getElementById('submitReg');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting…';
+      try{
+        // The backend creates the rescuer row (verification_status = pending
+        // always — a responder can never verify themselves), plus the
+        // specializations and credentials rows, in one call.
+        const record = await apiFetch('/rescuers', {method:'POST', body:{
+          fullName: draft.fullName, preferredName: draft.preferredName, age: draft.age,
+          phone: draft.phone, email: draft.email, city: draft.city, emergencyContact: draft.emergencyContact,
+          responderType: draft.responderType, org: draft.org, yearsExp: draft.yearsExp,
+          areas: draft.areas, maxRadius: draft.maxRadius,
+          specializations: draft.specializations,
+          credentials: draft.credentials
+        }});
+        toast('Submitted for verification', 'safe');
+        renderRescuerStatus(record);
+      }catch(e){
+        toast(e.message, null);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit for verification';
+      }
+    };
+  }
+
+  renderStep();
+}
+
+/* ---- VERIFICATION STATUS SCREEN (pending / rejected / expired) ---- */
+function verifyBadgeHtml(status){
+  const map = {
+    pending:  {cls:'verify-pending',  label:'PENDING VERIFICATION'},
+    verified: {cls:'verify-verified', label:'VERIFIED'},
+    rejected: {cls:'verify-rejected', label:'REJECTED'},
+    expired:  {cls:'verify-expired',  label:'CREDENTIAL EXPIRED'}
+  };
+  const m = map[status] || map.pending;
+  return `<span class="verify-badge ${m.cls}"><span class="dot"></span>${m.label}</span>`;
+}
+
+function renderRescuerStatus(rescuer){
+  const s = rescuer.verificationStatus;
+  let bodyText = '';
+  if (s === 'pending') bodyText = 'Your information has been submitted. A verifier will review your credentials before granting responder-dashboard access. This is simulated in the prototype — use the demo admin panel to approve or reject test accounts.';
+  else if (s === 'rejected') bodyText = rescuer.adminNote ? `Your submission was not accepted: "${escapeHtml(rescuer.adminNote)}"` : 'Your submission was not accepted. You can update your information and resubmit.';
+  else if (s === 'expired') bodyText = 'Your previously verified credentials have expired. Please update your credential dates and resubmit for re-verification.';
+
+  app.innerHTML = `
+    <div class="status-hero">
+      ${verifyBadgeHtml(s)}
+      <p style="margin-top:14px;">${bodyText}</p>
+    </div>
+    <div class="reg-card">
+      <h2 class="display">Your submission</h2>
+      <div class="profile-row"><span class="pr-label">Name</span><span class="pr-val">${escapeHtml(rescuer.fullName)}</span></div>
+      <div class="profile-row"><span class="pr-label">Responder type</span><span class="pr-val">${escapeHtml(rescuer.responderType)}</span></div>
+      <div class="profile-row"><span class="pr-label">Specializations</span><span class="pr-val">${rescuer.specializations.length ? escapeHtml(rescuer.specializations.join(', ')) : '—'}</span></div>
+      <div class="profile-row"><span class="pr-label">Credentials</span><span class="pr-val">${rescuer.credentials.length}</span></div>
+      <div class="btn-row" style="margin-top:16px;">
+        <button class="secondary-btn" id="refreshStatus">↻ Refresh status</button>
+        ${s !== 'pending' ? '<button class="primary-btn" id="editResubmit">Edit & resubmit</button>' : ''}
+      </div>
+      <div class="admin-link-row">
+        <button class="admin-link" id="toAdmin">Open demo verification admin →</button>
+        <button class="admin-link" id="statusBackHome">← Back to home</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('refreshStatus').onclick = async () => {
+    const fresh = await getMyRescuerRecord();
+    if (fresh) renderRescuerStatus(fresh); else toast('Could not refresh — try again', null);
+  };
+  document.getElementById('toAdmin').onclick = () => setView('admin');
+  document.getElementById('statusBackHome').onclick = () => setView('home');
+  const editBtn = document.getElementById('editResubmit');
+  // NOTE: responders can no longer flip their own verification status back
+  // to "pending" from the frontend — only an admin can change a rescuer's
+  // verification_status (server-enforced). This button now just points
+  // them at the admin panel to request another look.
+  if (editBtn) editBtn.onclick = () => {
+    toast('Ask an admin to review your submission again from the verification admin panel.', null);
+    setView('admin');
+  };
+}
+
+/* =========================================================================
+   RESCUER DASHBOARD
+   ========================================================================= */
+async function renderRescuerDashboard(myRescuer){
+  let tab = 'active'; // 'active' | 'profile'
+
+  app.innerHTML = `
+    <div class="admin-link-row" style="text-align:left;margin-bottom:8px;">
+      <button class="admin-link" id="dashBackHome">← Back to home</button>
+    </div>
+    <div class="reg-card" id="statusCard"></div>
+    <div class="section-tabs">
+      <button class="section-tab active" id="tabActive">Active emergencies</button>
+      <button class="section-tab" id="tabProfile">Profile</button>
+    </div>
+    <div id="dashBody"></div>
+  `;
+  document.getElementById('dashBackHome').onclick = () => setView('home');
+
+  function drawStatusCard(r){
+    const expiryWarnings = (r.credentials||[]).map(c => {
+      const d = daysUntil(c.expiry);
+      if (d == null) return '';
+      if (d < 0) return `<div class="cred-expiry-crit">⚠ ${escapeHtml(c.name||'Credential')} certification expired.</div>`;
+      if (d <= 30) return `<div class="cred-expiry-warn">⚠ ${escapeHtml(c.name||'Credential')} certification expires in ${d} day${d===1?'':'s'}.</div>`;
+      return '';
+    }).join('');
+    document.getElementById('statusCard').innerHTML = `
+      <div class="dash-head"><h2 class="display">My status</h2>${verifyBadgeHtml(r.verificationStatus)}</div>
+      <div class="field-hint" style="margin-bottom:10px;">Specializations: ${r.specializations.length ? escapeHtml(r.specializations.join(' · ')) : '—'}</div>
+      ${expiryWarnings}
+      <div class="field-hint" style="margin-bottom:4px;">Availability</div>
+      <div class="avail-row" id="availRow">
+        <button class="avail-btn ${r.availability==='available'?'active-available':''}" data-a="available">Available</button>
+        <button class="avail-btn ${r.availability==='busy'?'active-busy':''}" data-a="busy">Busy</button>
+        <button class="avail-btn ${r.availability==='offline'?'active-offline':''}" data-a="offline">Offline</button>
+      </div>
+    `;
+    document.getElementById('availRow').querySelectorAll('.avail-btn').forEach(btn => {
+      btn.onclick = async () => {
+        const a = btn.getAttribute('data-a');
+        try{
+          const updated = await apiFetch('/rescuers/me', {method:'PUT', body:{availability: a}});
+          r.availability = updated.availability;
+          toast('Availability updated: ' + a.toUpperCase(), null);
+        }catch(e){ toast(e.message, null); }
+        drawStatusCard(r);
+      };
+    });
+  }
+  drawStatusCard(myRescuer);
+
+  document.getElementById('tabActive').onclick = () => { tab='active'; setTabs(); drawActiveTab(); };
+  document.getElementById('tabProfile').onclick = () => { tab='profile'; setTabs(); drawProfileTab(); };
+  function setTabs(){
+    document.getElementById('tabActive').classList.toggle('active', tab==='active');
+    document.getElementById('tabProfile').classList.toggle('active', tab==='profile');
+  }
+
+  const expandedIds = new Set();
+  const urgencyRank = {critical:0, urgent:1, unclear:2, 'not-distress':3};
+
+  function priorityScore(sig, qualified){
+    if (sig.status === 'resolved') return 100000;
+    const urgency = sig.triage ? sig.triage.urgency : 'unclear';
+    const uRank = urgencyRank[urgency] !== undefined ? urgencyRank[urgency] : 2;
+    const waitMin = sig.status === 'active' ? (Date.now() - sig.createdAt) / 60000 : 0;
+    let score = uRank * 100;
+    if (!qualified) score += 50;
+    if (sig.status === 'responding') score += 30;
+    score -= Math.min(waitMin, 20) * 2;
+    return score;
+  }
+
+  async function drawActiveTab(){
+    const body = document.getElementById('dashBody');
+    body.innerHTML = `
+      <div class="dash-head">
+        <h2 class="display">Active emergencies</h2>
+        <button class="refresh-btn" id="refreshBtn">↻ refresh</button>
+      </div>
+      <div class="dash-meta" style="margin-bottom:16px;">Sorted by priority · auto-updates every 5s</div>
+      <div id="signalList"></div>
+    `;
+    document.getElementById('refreshBtn').onclick = drawList;
+
+    let knownIds = null;
+    let audioKnownIds = null;
+
+    async function drawList(){
+      const list = await loadSignals();
+      const container = document.getElementById('signalList');
+      const fresh = await getMyRescuerRecord(); // pick up availability/verification changes made elsewhere
+      if (fresh) myRescuer = fresh;
+
+      if (knownIds){
+        const newOnes = list.filter(s => !knownIds.has(s.id) && s.status === 'active');
+        newOnes.forEach(s => {
+          const q = isQualified(myRescuer, s.category);
+          toast((q ? 'New matching signal: ' : 'New signal: ') + s.name, 'danger');
+        });
+      }
+      knownIds = new Set(list.map(s => s.id));
+
+      if (audioKnownIds){
+        const newAudio = list.filter(s => s.audioDataUrl && !audioKnownIds.has(s.id));
+        newAudio.forEach(s => toast('Voice update received: ' + s.name, 'danger'));
+      }
+      audioKnownIds = new Set(list.filter(s => s.audioDataUrl).map(s => s.id));
+
+      if (!list.length){
+        container.innerHTML = `
+          <div class="empty-state">
+            No signals yet. This board updates automatically when someone sends an SOS.
+            <br><button class="seed-btn" id="seedBtn">Load demo signals</button>
+          </div>`;
+        const seedBtn = document.getElementById('seedBtn');
+        if (seedBtn) seedBtn.onclick = async () => { await seedDemoSignals(); drawList(); };
+        return;
+      }
+
+      const withScore = list.map(sig => ({sig, qualified: isQualified(myRescuer, sig.category)}));
+      withScore.sort((a,b) => priorityScore(a.sig,a.qualified) - priorityScore(b.sig,b.qualified));
+
+      container.innerHTML = withScore.map(({sig, qualified}) => {
+        const level = escalationLevel(sig);
+        const statusClass = sig.status === 'resolved' ? 'resolved' : (sig.status === 'responding' ? 'responding' : escalationClass(level));
+        const badgeClass = sig.status === 'resolved' ? 'badge-resolved' : (sig.status === 'responding' ? 'badge-responding' : 'badge-active');
+        const badgeText = sig.status === 'resolved' ? 'RESOLVED' : (sig.status === 'responding' ? 'RESPONDER ASSIGNED' : (level==='normal'?'ACTIVE — UNCLAIMED':escalationLabel(level)));
+        const locLine = (sig.lat != null) ? `<a href="https://www.google.com/maps?q=${sig.lat},${sig.lng}" target="_blank" rel="noopener">📍 open location</a>` : '';
+        const category = sig.category || (sig.triage && sig.triage.incident_type) || 'unknown';
+        const catLabel = CATEGORIES[category] || 'Unknown';
+        const waitS = sig.status === 'active' ? Math.floor((Date.now()-sig.createdAt)/1000) : null;
+
+        const audioBlock = sig.audioDataUrl ? `
+          <div class="recv-audio">
+            <div class="recv-audio-label">🎙️ Voice update</div>
+            <audio controls src="${sig.audioDataUrl}"></audio>
+          </div>` : '';
+
+        let triageBlock = '';
+        if (sig.note || sig.voiceTranscript){
+          if (!sig.triage){
+            triageBlock = `<span class="triage-tag triage-pending">analyzing note…</span>`;
+          } else {
+            const t = sig.triage;
+            const tagClass = 'triage-' + (t.urgency || 'unclear');
+            const harmBanner = t.self_harm_flag ? `<div class="self-harm-banner">⚠ Note flagged for possible self-harm risk — treat as highest priority and consider looping in a crisis line alongside your response.</div>` : '';
+            const facts = (t.extracted_facts && t.extracted_facts.length) ? `<div class="ai-facts">${t.extracted_facts.map(escapeHtml).join(' · ')}</div>` : '';
+            triageBlock = `
+              ${harmBanner}
+              <span class="triage-tag ${tagClass}">${(t.urgency || 'unclear').toUpperCase()}</span>
+              <div class="ai-note">${escapeHtml(t.summary || '')}</div>
+              ${facts}
+            `;
+          }
+        }
+
+        const assignedBlock = sig.status === 'responding' ? `
+          <div class="assigned-block">
+            <b>${sig.assignedRescuerId === myRescuer.id ? 'You are' : escapeHtml(sig.assignedRescuerName||'A responder') + ' is'} responding.</b><br>
+            Qualification: ${escapeHtml(sig.assignedQualification || '—')} · Accepted ${sig.acceptedAt ? timeAgo(sig.acceptedAt) : '—'}
+          </div>` : '';
+
+        const isExpanded = expandedIds.has(sig.id);
+        const detail = isExpanded ? `
+          <div class="detail-panel">
+            <div class="dp-row"><span class="dp-label">Type:</span> ${escapeHtml(sig.name)}${sig.lat==null?' · location unavailable':''}</div>
+            <div class="dp-row"><span class="dp-label">Description:</span> ${escapeHtml(sig.note || '—')}</div>
+            <div class="dp-row"><span class="dp-label">Required qualification:</span> ${escapeHtml((QUALIFICATION_TO_CATEGORY[category]||[]).join(', ') || 'None specific — general assistance')}</div>
+            <div class="dp-row"><span class="dp-label">Your matching qualification:</span> ${escapeHtml((myRescuer.specializations||[]).filter(s => (QUALIFICATION_TO_CATEGORY[category]||[]).includes(s)).join(', ') || 'None')}</div>
+            ${!qualified ? `<div class="not-qualified-warn">⚠ You are not verified for this emergency type. You may still assist if no qualified responder is available, but you should proceed with appropriate caution.</div>` : ''}
+          </div>` : '';
+
+        const acceptDisabled = sig.status !== 'active';
+        const actions = sig.status === 'resolved' ? '' : `
+          ${sig.status === 'active' ? `<button data-act="toggle" data-id="${sig.id}">${isExpanded ? 'Hide details' : 'Review details'}</button>` : ''}
+          ${sig.status === 'active' ? `<button class="${qualified?'accept-btn':'warn-btn'}" data-act="accept" data-id="${sig.id}" ${acceptDisabled?'disabled':''}>${qualified ? '✓ ACCEPT & RESPOND' : '⚠ ACCEPT ANYWAY'}</button>` : ''}
+          ${sig.status === 'responding' && sig.assignedRescuerId === myRescuer.id ? `<button data-act="withdraw" data-id="${sig.id}">Withdraw</button><button data-act="resolve" data-id="${sig.id}">Mark resolved</button>` : ''}
+          ${locLine}
+        `;
+
+        return `
+          <div class="signal-row ${statusClass}">
+            <div class="sig-top">
+              <div class="sig-name display">${escapeHtml(sig.name)}</div>
+              <div class="sig-badge ${badgeClass} mono">${badgeText}</div>
+            </div>
+            <div class="sig-time mono">${timeAgo(sig.createdAt)}</div>
+            <div>
+              <span class="sig-category mono">${escapeHtml(catLabel)}</span>
+              <span class="match-tag ${qualified?'match-yes':'match-no'} mono">${qualified?'MATCH: '+matchLabel(category)+' ✓':'NOT QUALIFIED FOR THIS INCIDENT'}</span>
+            </div>
+            ${waitS != null ? `<div class="sig-wait ${escalationClass(level)} mono">Waiting for responder: ${mmss(waitS)}</div>` : ''}
+            ${assignedBlock}
+            ${audioBlock}
+            ${triageBlock}
+            ${detail}
+            <div class="sig-actions" style="margin-top:10px;">${actions}</div>
+          </div>
+        `;
+      }).join('');
+
+      container.querySelectorAll('button[data-act]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-id');
+          const act = btn.getAttribute('data-act');
+
+          if (act === 'toggle'){
+            if (expandedIds.has(id)) expandedIds.delete(id); else expandedIds.add(id);
+            drawList();
+            return;
+          }
+
+          if (act === 'accept'){
+            const current = await loadSignals();
+            const sig = current.find(s => s.id === id);
+            if (!sig) return;
+            if (sig.status !== 'active'){
+              toast('This emergency has already been assigned to another responder.', null);
+              drawList();
+              return;
+            }
+            const category = sig.category || (sig.triage && sig.triage.incident_type) || 'unknown';
+            const qualified = isQualified(myRescuer, category);
+            if (!qualified && !confirm('You are not verified for this emergency type. Accept anyway?')) return;
+            // The backend independently re-checks status/verification/
+            // qualification and computes the actual assignment — this
+            // frontend check is only for the confirm-dialog UX.
+            try{
+              await apiFetch(`/signals/${id}/accept`, {method:'POST'});
+              toast('Emergency accepted — you are now responding', 'safe');
+            }catch(e){ toast(e.message, null); }
+            drawList();
+            return;
+          }
+
+          if (act === 'withdraw'){
+            try{
+              await apiFetch(`/signals/${id}/withdraw`, {method:'POST'});
+              toast('Withdrawn — signal is active again', null);
+            }catch(e){ toast(e.message, null); }
+            drawList();
+            return;
+          }
+
+          if (act === 'resolve'){
+            try{
+              await apiFetch(`/signals/${id}/resolve`, {method:'POST'});
+              toast('Marked as resolved', 'safe');
+            }catch(e){ toast(e.message, null); }
+            drawList();
+            return;
+          }
+        });
+      });
+    }
+
+    await drawList();
+    pollTimer = setInterval(drawList, 5000);
+  }
+
+  function drawProfileTab(){
+    if (pollTimer){ clearInterval(pollTimer); pollTimer = null; }
+    const body = document.getElementById('dashBody');
+    const credRows = (myRescuer.credentials||[]).map(c => {
+      const d = daysUntil(c.expiry);
+      let warn = '';
+      if (d != null && d < 0) warn = `<div class="cred-expiry-crit">⚠ Expired</div>`;
+      else if (d != null && d <= 30) warn = `<div class="cred-expiry-warn">⚠ Expires in ${d} day${d===1?'':'s'}</div>`;
+      return `
+        <div class="cred-card">
+          <div class="cred-card-head"><span>${escapeHtml(c.name || 'Credential')}</span><span class="mono">${escapeHtml(c.type||'')}</span></div>
+          <div class="profile-row"><span class="pr-label">Issuing org</span><span class="pr-val">${escapeHtml(c.org||'—')}</span></div>
+          <div class="profile-row"><span class="pr-label">Number</span><span class="pr-val">${c.number ? escapeHtml(c.number.slice(0,3) + '•••' + c.number.slice(-2)) : '—'}</span></div>
+          <div class="profile-row"><span class="pr-label">Issued</span><span class="pr-val">${escapeHtml(c.issued||'—')}</span></div>
+          <div class="profile-row"><span class="pr-label">Expires</span><span class="pr-val">${escapeHtml(c.expiry||'—')}</span></div>
+          ${warn}
+        </div>`;
+    }).join('') || '<div class="field-hint">No credentials on file.</div>';
+
+    body.innerHTML = `
+      <div class="reg-card">
+        <h2 class="display">Responder profile</h2>
+        <div class="profile-row"><span class="pr-label">Name</span><span class="pr-val">${escapeHtml(myRescuer.fullName)}</span></div>
+        <div class="profile-row"><span class="pr-label">Status</span><span class="pr-val">${verifyBadgeHtml(myRescuer.verificationStatus)}</span></div>
+        <div class="profile-row"><span class="pr-label">Responder type</span><span class="pr-val">${escapeHtml(myRescuer.responderType)}</span></div>
+        <div class="profile-row"><span class="pr-label">Organization</span><span class="pr-val">${escapeHtml(myRescuer.org||'—')}</span></div>
+        <div class="profile-row"><span class="pr-label">Experience</span><span class="pr-val">${escapeHtml(myRescuer.yearsExp||'0')} yrs</span></div>
+        <div class="profile-row"><span class="pr-label">Contact</span><span class="pr-val">${escapeHtml(myRescuer.phone)} · ${escapeHtml(myRescuer.email)}</span></div>
+        <div class="profile-row"><span class="pr-label">Response radius</span><span class="pr-val">${escapeHtml(myRescuer.maxRadius||'—')} km</span></div>
+        <div class="profile-row"><span class="pr-label">Areas</span><span class="pr-val">${escapeHtml(myRescuer.areas||'—')}</span></div>
+        <div class="profile-row"><span class="pr-label">Specializations</span><span class="pr-val">${escapeHtml((myRescuer.specializations||[]).join(', ')||'—')}</span></div>
+        <div class="profile-row"><span class="pr-label">Availability</span><span class="pr-val">${escapeHtml((myRescuer.availability||'available').toUpperCase())}</span></div>
+      </div>
+      <div class="reg-card">
+        <h2 class="display">Credentials & certifications</h2>
+        ${credRows}
+      </div>
+    `;
+  }
+
+  drawActiveTab();
+}
+
+/* =========================================================================
+   DEMO VERIFICATION ADMIN
+   ========================================================================= */
+async function renderAdmin(){
+  // Server-enforced: only the one shared admin account (role = "admin",
+  // logged in via the normal SIGNAL login form) can reach this panel's
+  // data — every /api/admin/* call checks req.user.role on the backend.
+  // This client-side check is presentation only, so non-admins get a clear
+  // message instead of an empty screen full of failed requests.
+  const acct = await getCurrentAccount();
+  if (!acct || acct.role !== 'admin'){
+    app.innerHTML = `
+      <div class="admin-link-row" style="text-align:left;margin-bottom:8px;">
+        <button class="admin-link" id="adminBackHome">← Back to home</button>
+      </div>
+      <div class="reg-card">
+        <h2 class="display">Admin access only</h2>
+        <p>Rescuer verification is restricted to the SIGNAL administrator account. Log in with the shared admin account (see your team's .env) to open this panel.</p>
+        <div class="btn-row" style="margin-top:14px;"><button class="primary-btn" id="adminToLogin">Log in</button></div>
+      </div>
+    `;
+    document.getElementById('adminBackHome').onclick = () => setView('home');
+    document.getElementById('adminToLogin').onclick = () => setView('login');
+    return;
+  }
+  app.innerHTML = `
+    <div class="admin-link-row" style="text-align:left;margin-bottom:8px;">
+      <button class="admin-link" id="adminBackHome">← Back to home</button>
+    </div>
+    <div class="demo-banner"><b>ADMIN-ONLY VERIFICATION.</b> Only the shared SIGNAL admin account can approve, reject, or request more info from a responder — enforced by the backend, not just hidden in the UI.</div>
+    <div class="dash-head">
+      <h2 class="display">Rescuer verification</h2>
+      <button class="refresh-btn" id="refreshAdmin">↻ refresh</button>
+    </div>
+    <div id="adminList"></div>
+  `;
+  document.getElementById('refreshAdmin').onclick = drawAdmin;
+  document.getElementById('adminBackHome').onclick = () => setView('home');
+
+  async function drawAdmin(){
+    const list = await loadRescuers();
+    const container = document.getElementById('adminList');
+    if (!list.length){
+      container.innerHTML = `<div class="empty-state">No rescuer sign-ups yet.</div>`;
+      return;
+    }
+    const order = {pending:0, expired:1, verified:2, rejected:3};
+    const sorted = [...list].sort((a,b) => (order[a.verificationStatus]??9) - (order[b.verificationStatus]??9) || b.createdAt - a.createdAt);
+
+    container.innerHTML = sorted.map(r => {
+      const credLines = (r.credentials||[]).map(c => {
+        const d = daysUntil(c.expiry);
+        const expTxt = c.expiry ? `${escapeHtml(c.expiry)}${d!=null && d<0 ? ' (EXPIRED)' : ''}` : '—';
+        return `<div class="profile-row"><span class="pr-label">${escapeHtml(c.name||'Credential')}</span><span class="pr-val">${escapeHtml(c.org||'—')} · #${escapeHtml(c.number||'—')} · exp ${expTxt}</span></div>`;
+      }).join('') || '<div class="field-hint">No credentials submitted.</div>';
+
+      return `
+        <div class="admin-row">
+          <div class="admin-row-head">
+            <div class="admin-name">${escapeHtml(r.fullName)}</div>
+            ${verifyBadgeHtml(r.verificationStatus)}
+          </div>
+          <div class="admin-sub">
+            ${escapeHtml(r.responderType)} · ${escapeHtml(r.org||'Independent')} · ${escapeHtml(r.yearsExp||'0')} yrs experience<br>
+            Specializations: ${escapeHtml((r.specializations||[]).join(', ')||'—')}
+          </div>
+          ${credLines}
+          ${r.adminNote ? `<div class="field-hint" style="margin-top:8px;">Verifier note: ${escapeHtml(r.adminNote)}</div>` : ''}
+          <div class="admin-actions">
+            <button class="approve" data-act="approve" data-id="${r.id}">Approve</button>
+            <button class="reject" data-act="reject" data-id="${r.id}">Reject</button>
+            <button data-act="info" data-id="${r.id}">Request more info</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    container.querySelectorAll('button[data-act]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.getAttribute('data-id');
+        const act = btn.getAttribute('data-act');
+        const rescuerRow = (await loadRescuers()).find(r => r.id === id);
+        if (!rescuerRow) return;
+        try{
+          // Server-enforced admin-only endpoints — the backend checks
+          // req.user.role === 'admin' on every one of these regardless of
+          // what this panel sends.
+          if (act === 'approve'){
+            await apiFetch(`/admin/rescuers/${id}/verify`, {method:'PATCH'});
+          } else if (act === 'reject'){
+            const note = prompt('Reason for rejection (shown to the rescuer):', rescuerRow.adminNote || '');
+            if (note === null) return;
+            await apiFetch(`/admin/rescuers/${id}/reject`, {method:'PATCH', body:{note, status:'rejected'}});
+          } else if (act === 'info'){
+            const note = prompt('What additional information is needed?', rescuerRow.adminNote || '');
+            if (note === null) return;
+            await apiFetch(`/admin/rescuers/${id}/reject`, {method:'PATCH', body:{note, status:'pending'}});
+          }
+          toast('Updated ' + rescuerRow.fullName, 'safe');
+        }catch(e){ toast(e.message, null); }
+        drawAdmin();
+      });
+    });
+  }
+
+  await drawAdmin();
+}
+
+/* =========================================================================
+   LOGIN
+   ========================================================================= */
+function renderLogin(){
+  app.innerHTML = `
+    <div class="auth-wrap">
+      <div class="auth-brand">
+        <div class="ab-dot"></div>
+        <h1 class="display">SIGNAL</h1>
+        <p>Welcome back</p>
+      </div>
+      <div class="reg-card">
+        <div id="loginError"></div>
+        <div class="field" id="fldLoginId">
+          <label>Email / phone number <span class="req">*</span></label>
+          <input id="loginId" type="text" autocomplete="username" placeholder="name@example.com or 09XXXXXXXXX">
+          <div class="field-error">Enter your email or phone number.</div>
+        </div>
+        <div class="field" id="fldLoginPw">
+          <label>Password <span class="req">*</span></label>
+          <div class="password-field">
+            <input id="loginPw" type="password" autocomplete="current-password" placeholder="••••••••">
+            <button type="button" class="password-toggle" id="toggleLoginPw" aria-label="Show password">SHOW</button>
+          </div>
+          <div class="field-error">Enter your password.</div>
+        </div>
+        <button class="primary-btn" id="submitLogin" type="button">LOG IN</button>
+        <div class="auth-links">
+          <button id="toForgot">Forgot password?</button>
+          <button id="loginToHome">← Back to home</button>
+        </div>
+        <div class="auth-switch">Don't have an account? <button id="toSignup">Create account</button></div>
+        <div class="demo-auth-note">Frontend prototype — no real authentication backend is connected yet. See the <button style="all:unset;color:var(--info);text-decoration:underline;cursor:pointer;" id="loginPrivacyLink">privacy notice</button> for details.</div>
+      </div>
+    </div>
+  `;
+  const idField = document.getElementById('fldLoginId');
+  const pwField = document.getElementById('fldLoginPw');
+  const idInput = document.getElementById('loginId');
+  const pwInput = document.getElementById('loginPw');
+  const submitBtn = document.getElementById('submitLogin');
+
+  document.getElementById('toggleLoginPw').onclick = (e) => {
+    const btn = e.currentTarget;
+    const showing = pwInput.type === 'text';
+    pwInput.type = showing ? 'password' : 'text';
+    btn.textContent = showing ? 'SHOW' : 'HIDE';
+    btn.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+  };
+  document.getElementById('loginToHome').onclick = () => setView('home');
+  document.getElementById('toForgot').onclick = () => setView('forgot');
+  document.getElementById('toSignup').onclick = () => setView('signup');
+  document.getElementById('loginPrivacyLink').onclick = () => openPrivacyModal();
+
+  submitBtn.onclick = async () => {
+    document.getElementById('loginError').innerHTML = '';
+    let valid = true;
+    if (!idInput.value.trim()){ idField.classList.add('invalid'); valid = false; } else idField.classList.remove('invalid');
+    if (!pwInput.value){ pwField.classList.add('invalid'); valid = false; } else pwField.classList.remove('invalid');
+    if (!valid) return;
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="btn-spinner" aria-hidden="true"></span>Logging in…';
+    idInput.disabled = true; pwInput.disabled = true;
+
+    try{
+      // The backend looks the account up by email OR phone, verifies the
+      // bcrypt hash, and sets the HTTP-only session cookie on success.
+      await apiFetch('/auth/login', {method:'POST', body:{identifier: idInput.value.trim(), password: pwInput.value}});
+      toast('Logged in', 'safe');
+      setView('home');
+      return;
+    }catch(e){
+      document.getElementById('loginError').innerHTML = `<div class="form-error-banner">${escapeHtml(e.message)}</div>`;
+    }
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'LOG IN';
+    idInput.disabled = false; pwInput.disabled = false;
+  };
+  pwInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitBtn.click(); });
+}
+
+/* =========================================================================
+   CREATE ACCOUNT
+   ========================================================================= */
+function renderSignup(){
+  app.innerHTML = `
+    <div class="auth-wrap">
+      <div class="auth-brand">
+        <div class="ab-dot"></div>
+        <h1 class="display">SIGNAL</h1>
+        <p>Create your account</p>
+      </div>
+      <div class="reg-card">
+        <div id="signupError"></div>
+        <div class="field" id="fldSFullName"><label>Full name <span class="req">*</span></label><input id="sFullName" maxlength="80"><div class="field-error">Full name is required.</div></div>
+        <div class="field" id="fldSEmail"><label>Email address <span class="req">*</span></label><input id="sEmail" type="email" autocomplete="email" maxlength="100"><div class="field-error">Enter a valid email address.</div></div>
+        <div class="field" id="fldSPhone"><label>Phone number <span class="req">*</span></label><input id="sPhone" type="tel" inputmode="numeric" maxlength="11" placeholder="09XXXXXXXXX"><div class="field-error">Enter a valid phone number (up to 11 digits).</div></div>
+        <div class="field" id="fldSPw">
+          <label>Password <span class="req">*</span></label>
+          <div class="password-field">
+            <input id="sPw" type="password" autocomplete="new-password">
+            <button type="button" class="password-toggle" id="toggleSPw" aria-label="Show password">SHOW</button>
+          </div>
+          <div class="pw-requirements" id="pwReq">At least 8 characters, one letter and one number.</div>
+          <div class="field-error">Password does not meet the requirements above.</div>
+        </div>
+        <div class="field" id="fldSPw2">
+          <label>Confirm password <span class="req">*</span></label>
+          <div class="password-field">
+            <input id="sPw2" type="password" autocomplete="new-password">
+            <button type="button" class="password-toggle" id="toggleSPw2" aria-label="Show password">SHOW</button>
+          </div>
+          <div class="field-error">Passwords do not match.</div>
+        </div>
+        <div class="field"><label>Emergency contact (optional)</label><input id="sEmergency" maxlength="80" placeholder="Name + number"></div>
+        <div class="checkbox-line" id="fldTerms">
+          <input type="checkbox" id="sTerms">
+          <label for="sTerms">I agree to the Terms of Use and Privacy Policy. This is a prototype — see the <button type="button" style="all:unset;color:var(--info);text-decoration:underline;cursor:pointer;" id="signupPrivacyLink">privacy notice</button> for what data this demo stores.</label>
+        </div>
+        <button class="primary-btn" id="submitSignup" type="button">CREATE ACCOUNT</button>
+        <div class="auth-switch">Already have an account? <button id="toLogin2">Log in</button></div>
+        <div class="admin-link-row"><button class="admin-link" id="signupToHome">← Back to home</button></div>
+      </div>
+    </div>
+  `;
+  const f = id => document.getElementById(id);
+  f('toggleSPw').onclick = () => { const i=f('sPw'); const show=i.type==='text'; i.type=show?'password':'text'; f('toggleSPw').textContent = show?'SHOW':'HIDE'; };
+  f('toggleSPw2').onclick = () => { const i=f('sPw2'); const show=i.type==='text'; i.type=show?'password':'text'; f('toggleSPw2').textContent = show?'SHOW':'HIDE'; };
+  f('signupToHome').onclick = () => setView('home');
+  f('toLogin2').onclick = () => setView('login');
+  f('signupPrivacyLink').onclick = () => openPrivacyModal();
+
+  f('sPhone').addEventListener('input', () => {
+    const digits = f('sPhone').value.replace(/\D/g,'').slice(0,11);
+    if (digits !== f('sPhone').value) f('sPhone').value = digits;
+  });
+
+  function pwStrongEnough(pw){ return pw.length >= 8 && /[A-Za-z]/.test(pw) && /[0-9]/.test(pw); }
+
+  f('submitSignup').onclick = async () => {
+    f('signupError').innerHTML = '';
+    let valid = true;
+    const name = f('sFullName').value.trim();
+    const email = f('sEmail').value.trim();
+    const phone = f('sPhone').value.trim();
+    const pw = f('sPw').value;
+    const pw2 = f('sPw2').value;
+
+    if (!name){ f('fldSFullName').classList.add('invalid'); valid = false; } else f('fldSFullName').classList.remove('invalid');
+    if (!isEmailLike(email)){ f('fldSEmail').classList.add('invalid'); valid = false; } else f('fldSEmail').classList.remove('invalid');
+    if (!isPhoneLike(phone) || phone.length < 7){ f('fldSPhone').classList.add('invalid'); valid = false; } else f('fldSPhone').classList.remove('invalid');
+    if (!pwStrongEnough(pw)){ f('fldSPw').classList.add('invalid'); valid = false; } else f('fldSPw').classList.remove('invalid');
+    if (pw !== pw2 || !pw2){ f('fldSPw2').classList.add('invalid'); valid = false; } else f('fldSPw2').classList.remove('invalid');
+    const termsOk = f('sTerms').checked;
+    f('fldTerms').classList.toggle('invalid', !termsOk);
+    if (!termsOk) valid = false;
+    if (!valid) return;
+
+    const btn = f('submitSignup');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="btn-spinner" aria-hidden="true"></span>Submitting registration…';
+
+    try{
+      // The backend hashes the password with bcrypt, checks for a
+      // duplicate email/phone, creates the user row (role = "user"), and
+      // sets the login cookie — all server-side.
+      await apiFetch('/auth/register', {method:'POST', body:{
+        fullName: name, email, phone,
+        emergencyContact: f('sEmergency').value.trim(),
+        password: pw
+      }});
+    }catch(e){
+      btn.disabled = false; btn.textContent = 'CREATE ACCOUNT';
+      f('signupError').innerHTML = `<div class="form-error-banner">${escapeHtml(e.message)}</div>`;
+      return;
+    }
+
+    app.innerHTML = `
+      <div class="auth-wrap">
+        <div class="reg-card">
+          <div class="form-success-banner">✓ Account created. You're logged in.</div>
+          <p style="color:var(--muted);font-size:13px;line-height:1.6;">Your account is stored in the SIGNAL backend database, not just this browser — you can log in with it from any device.</p>
+          <button class="primary-btn" id="afterSignupHome" style="margin-top:14px;">Continue to SIGNAL</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('afterSignupHome').onclick = () => setView('home');
+  };
+}
+
+/* =========================================================================
+   FORGOT PASSWORD
+   ========================================================================= */
+function renderForgotPassword(){
+  app.innerHTML = `
+    <div class="auth-wrap">
+      <div class="auth-brand">
+        <div class="ab-dot"></div>
+        <h1 class="display">RESET YOUR PASSWORD</h1>
+        <p>Enter your email or phone number.</p>
+      </div>
+      <div class="reg-card">
+        <div id="forgotBody">
+          <div class="field" id="fldForgot">
+            <label>Email / phone number <span class="req">*</span></label>
+            <input id="forgotId" type="text" placeholder="name@example.com or 09XXXXXXXXX">
+            <div class="field-error">Enter your email or phone number.</div>
+          </div>
+          <button class="primary-btn" id="sendReset" type="button">SEND RESET LINK</button>
+          <div class="admin-link-row"><button class="admin-link" id="backToLoginFromForgot">← Back to login</button></div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('backToLoginFromForgot').onclick = () => setView('login');
+  document.getElementById('sendReset').onclick = async () => {
+    const field = document.getElementById('fldForgot');
+    const input = document.getElementById('forgotId');
+    if (!input.value.trim()){ field.classList.add('invalid'); return; }
+    field.classList.remove('invalid');
+    const btn = document.getElementById('sendReset');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="btn-spinner" aria-hidden="true"></span>Sending reset instructions…';
+    // No backend is connected — nothing is actually emailed or texted here.
+    // This delay + message simulates the flow for the prototype.
+    await new Promise(r => setTimeout(r, 700));
+    document.getElementById('forgotBody').innerHTML = `
+      <div class="form-success-banner">If an account exists for this information, password recovery instructions will be sent.</div>
+      <p style="color:var(--muted);font-size:12px;line-height:1.6;">This prototype has no email/SMS backend connected, so nothing is actually sent yet — this message is shown either way, which is standard practice to avoid revealing which accounts exist.</p>
+      <button class="secondary-btn" id="backToLoginFromForgot2" style="margin-top:14px;">← Back to login</button>
+    `;
+    document.getElementById('backToLoginFromForgot2').onclick = () => setView('login');
+  };
+}
+
+/* =========================================================================
+   ACCOUNT (minimal demo account screen)
+   ========================================================================= */
+async function renderAccount(){
+  const acct = await getCurrentAccount();
+  if (!acct){ setView('login'); return; }
+  app.innerHTML = `
+    <div class="reg-card">
+      <h2 class="display">Your account</h2>
+      <p>Frontend prototype account details, stored only in this browser.</p>
+      <div class="profile-row"><span class="pr-label">Name</span><span class="pr-val">${escapeHtml(acct.fullName)}</span></div>
+      <div class="profile-row"><span class="pr-label">Email</span><span class="pr-val">${escapeHtml(acct.email)}</span></div>
+      <div class="profile-row"><span class="pr-label">Phone</span><span class="pr-val">${escapeHtml(acct.phone)}</span></div>
+      <div class="profile-row"><span class="pr-label">Emergency contact</span><span class="pr-val">${escapeHtml(acct.emergencyContact||'—')}</span></div>
+      <div class="btn-row" style="margin-top:16px;">
+        <button class="secondary-btn" id="acctPrivacy">Privacy & data</button>
+        <button class="primary-btn" id="acctLogout">Log out</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('acctPrivacy').onclick = () => openPrivacyModal();
+  document.getElementById('acctLogout').onclick = async () => { try{ await apiFetch('/auth/logout', {method:'POST'}); }catch(e){} toast('Logged out', null); setView('home'); };
+}
+
+/* =========================================================================
+   WELCOME GATE — shown once on initial load (after the splash) for anyone
+   not already logged in. Logging in/creating an account is entirely
+   optional here: since SIGNAL is an emergency tool, sending an SOS is
+   never blocked behind an account — "I need help now" and "Continue
+   without an account" both skip straight past this screen.
+   ========================================================================= */
+function renderGate(){
+  app.innerHTML = `
+    <div class="auth-wrap">
+      <div class="auth-brand">
+        <div class="ab-dot"></div>
+        <h1 class="display">SIGNAL</h1>
+        <p>Community Distress Network</p>
+      </div>
+      <div class="reg-card">
+        <h2 class="display">Welcome</h2>
+        <p>Log in or create an account to keep your rescuer profile and details saved on this browser — or continue without one.</p>
+        <button class="primary-btn" id="gateLogin" type="button">LOG IN</button>
+        <div class="btn-row" style="margin-top:10px;">
+          <button class="secondary-btn" id="gateSignup" type="button">Create account</button>
+        </div>
+        <div class="auth-switch" style="margin-top:18px;">
+          <button id="gateGuest" type="button">Continue without an account →</button>
+        </div>
+      </div>
+      <button class="role-card need" id="gateSOS" type="button" style="margin-top:14px;">
+        <div class="role-eyebrow">Emergency? Skip all of this</div>
+        <h2>I need help now</h2>
+        <p>Go straight to sending a distress signal — no account needed.</p>
+      </button>
+    </div>
+  `;
+  document.getElementById('gateLogin').onclick = () => setView('login');
+  document.getElementById('gateSignup').onclick = () => setView('signup');
+  document.getElementById('gateGuest').onclick = () => setView('home');
+  document.getElementById('gateSOS').onclick = () => setView('need');
+}
+
+/* =========================================================================
+   ROUTER
+   ========================================================================= */
+function render(){
+  if (view === 'home') renderHome();
+  else if (view === 'gate') renderGate();
+  else if (view === 'need') renderNeed();
+  else if (view === 'rescuer') renderRescuer();
+  else if (view === 'admin') renderAdmin();
+  else if (view === 'login') renderLogin();
+  else if (view === 'signup') renderSignup();
+  else if (view === 'forgot') renderForgotPassword();
+  else if (view === 'account') renderAccount();
+}
+
+// idle brand pulse
+setInterval(() => {
+  brandDot.style.opacity = brandDot.style.opacity === '0.3' ? '1' : '0.3';
+}, 900);
+
+/* Initial route: logged-in users go straight to the home screen; everyone
+   else sees the welcome gate (login/create account/skip) once, right
+   after the splash. This runs immediately, underneath the still-visible
+   splash overlay, so there's no extra flash once the splash fades. */
+(async function initialRoute(){
+  let acct = null;
+  try{ acct = await getCurrentAccount(); }catch(e){}
+  setView(acct ? 'home' : 'gate');
+})();
+
+</script>
+</body>
+</html>
