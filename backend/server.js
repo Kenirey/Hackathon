@@ -247,13 +247,17 @@ function signToken(user) {
 }
 
 function setAuthCookie(res, token) {
-  // HTTP-only cookie so frontend JS can never read the JWT directly.
-  // `sameSite: 'lax'` + no `secure` flag keeps this working over plain
-  // http://localhost during development; add `secure` behind HTTPS in prod.
-  res.setHeader('Set-Cookie', `${COOKIE_NAME}=${token}; HttpOnly; Path=/; Max-Age=${7 * 24 * 60 * 60}; SameSite=Lax`);
+  res.setHeader(
+    'Set-Cookie',
+    `${COOKIE_NAME}=${token}; HttpOnly; Path=/; Max-Age=${7 * 24 * 60 * 60}; SameSite=None; Secure`
+  );
 }
+
 function clearAuthCookie(res) {
-  res.setHeader('Set-Cookie', `${COOKIE_NAME}=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax`);
+  res.setHeader(
+    'Set-Cookie',
+    `${COOKIE_NAME}=; HttpOnly; Path=/; Max-Age=0; SameSite=None; Secure`
+  );
 }
 
 function safeUser(row) {
