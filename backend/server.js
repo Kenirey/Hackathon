@@ -391,30 +391,41 @@ function generateResetToken() {
 }
 
 async function sendPasswordResetEmail(toEmail, rawToken) {
+  console.log('SIGNAL: password reset email attempt started');
+
   const transporter = getMailTransporter();
-  const resetLink = `${RESET_URL_BASE}?token=${encodeURIComponent(rawToken)}`;
 
   if (!transporter) {
-    // Do NOT log the raw token or any credential — just note that sending
-    // was skipped, so a misconfigured .env fails loudly but safely.
-    console.warn('SIGNAL: EMAIL_HOST/EMAIL_USER/EMAIL_PASSWORD not set — password reset email not sent. Configure these in .env (see env.example).');
+    console.error('SIGNAL: mail transporter is NOT configured');
     return false;
   }
 
-  await transporter.sendMail({
-    from: EMAIL_FROM,
-    to: toEmail,
-    subject: 'SIGNAL — Reset your password',
-    text:
-      `We received a request to reset your SIGNAL account password.\n\n` +
-      `Reset your password using this link (expires in ${RESET_TOKEN_TTL_MINUTES} minutes):\n${resetLink}\n\n` +
-      `If you did not request this, you can safely ignore this email — your password will not be changed.`,
-    html:
-      `<p>We received a request to reset your SIGNAL account password.</p>` +
-      `<p><a href="${resetLink}">Click here to reset your password</a> (expires in ${RESET_TOKEN_TTL_MINUTES} minutes).</p>` +
-      `<p>If you did not request this, you can safely ignore this email — your password will not be changed.</p>`
-  });
-  return true;
+  console.log('SIGNAL: mail transporter configured');
+
+  const resetLink = `${RESET_URL_BASE}?token=${encodeURIComponent(rawToken)}`;
+
+  try {
+    const info = await transporter.sendMail({
+      from: EMAIL_FROM,
+      to: toEmail,
+      subject: 'SIGNAL — Reset your password',
+      text:
+        `We received a request to reset your SIGNAL account password.\n\n` +
+        `Reset your password using this link (expires in ${RESET_TOKEN_TTL_MINUTES} minutes):\n${resetLink}\n\n` +
+        `If you did not request this, you can safely ignore this email — your password will not be changed.`,
+      html:
+        `<p>We received a request to reset your SIGNAL account password.</p>` +
+        `<p><a href="${resetLink}">Click here to reset your password</a> (expires in ${RESET_TOKEN_TTL_MINUTES} minutes).</p>` +
+        `<p>If you did not request this, you can safely ignore this email — your password will not be changed.</p>`
+    });
+
+    console.log('SIGNAL: password reset email sent:', info.messageId);
+    return true;
+
+  } catch (e) {
+    console.error('SIGNAL: SMTP SEND ERROR:', e.message);
+    throw e;
+  }
 }
 
 /* =============================================================================
