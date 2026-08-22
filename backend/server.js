@@ -647,6 +647,9 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     }
 
     const user = await get('SELECT * FROM users WHERE email = ?', [normEmail]);
+
+    console.log('SIGNAL: forgot-password request received');
+    console.log('SIGNAL: account lookup:', user ? 'FOUND' : 'NOT FOUND');
     if (user) {
       // Invalidate any still-outstanding tokens for this user before
       // issuing a new one, so only the newest reset link/code works.
